@@ -1,0 +1,3 @@
+[submodule "3rdParty/Gamepad-Core"]
+	path = 3rdParty/Gamepad-Core
+	url = https://github.com/rafaelvaloto/Dualsense-Multiplatform.git
