@@ -6,9 +6,6 @@
 #include "gamepad_types_api.h"
 #include "GCore/Types/Structs/Context/InputContext.h"
 
-/** Callback used by the bridge to forward native log messages to the host. */
-typedef void (*GCU_LogCallback)(int Level, const char* Message);
-
 extern "C" {
     /** Shuts down the bridge and releases all registered devices and platform resources. */
     __declspec(dllexport) void GCU_Shutdown();

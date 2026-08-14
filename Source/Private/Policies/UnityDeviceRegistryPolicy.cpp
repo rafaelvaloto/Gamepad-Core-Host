@@ -10,14 +10,6 @@ int g_UnityEngineTypeId = 0;
 AllocEngineDeviceCallback g_UnityAllocDeviceCallback = nullptr;
 DispatchNewGamepadCallback g_UnityDispatchDeviceCallback = nullptr;
 DisconnectDeviceCallback g_UnityDisconnectDeviceCallback = nullptr;
-void GCU_InitializeDeviceRegistryPolicy(const int TypeId, const AllocEngineDeviceCallback allocCallback,
-    const DispatchNewGamepadCallback dispatchCallback, const DisconnectDeviceCallback disconnectCallback) {
-    g_UnityEngineTypeId = TypeId;
-    g_UnityAllocDeviceCallback = allocCallback;
-    g_UnityDispatchDeviceCallback = dispatchCallback;
-    g_UnityDisconnectDeviceCallback = disconnectCallback;
-    GCU::FUnityDeviceRegistry::Initialize();
-}
 
 namespace GCU {
     UnityDeviceRegistryPolicy::EngineIdType UnityDeviceRegistryPolicy::AllocEngineDevice() {
@@ -34,3 +26,12 @@ namespace GCU {
             g_UnityDispatchDeviceCallback(id);
     }
 } // GCU
+
+void GCU_InitializeDeviceRegistryPolicy(const int TypeId, const AllocEngineDeviceCallback allocCallback,
+    const DispatchNewGamepadCallback dispatchCallback, const DisconnectDeviceCallback disconnectCallback) {
+    g_UnityEngineTypeId = TypeId;
+    g_UnityAllocDeviceCallback = allocCallback;
+    g_UnityDispatchDeviceCallback = dispatchCallback;
+    g_UnityDisconnectDeviceCallback = disconnectCallback;
+    GCU::FUnityDeviceRegistry::Initialize();
+}

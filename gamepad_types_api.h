@@ -5,8 +5,10 @@
 #ifndef GAMEPADCOREUNITY_GAMEPAD_TYPES_API_H
 #define GAMEPADCOREUNITY_GAMEPAD_TYPES_API_H
 
+#include <cstdint>
+
 /**
- * @file gamepad_unity_api.h
+ * @file gamepad_types_api.h
  * @brief Unity integration API for Gamepad-Core library.
  *
  * This header defines the C/C++ API for integrating the Gamepad-Core library with Unity.
@@ -24,12 +26,30 @@
  * @struct GCUDeviceDescriptor
  */
 struct GCUDeviceDescriptor {
+    /// Unique platform-specific handle identifying the device hardware
     std::uint64_t Handle;
+    /// Type identifier for the device (corresponds to EDSDeviceType: DualSense, DualSenseEdge, DualShock4, NotFound) 1,2,3,4
     std::int32_t DeviceType;
+    /// Connection method type (corresponds to EDSDeviceConnection: Usb, Bluetooth, Unrecognized) 1,2,3
     std::int32_t ConnectionType;
+    /// Connection status flag: non-zero if device is currently connected, zero otherwise
     std::int32_t IsConnected;
+    /// Platform-specific device path or identifier string (null-terminated, max 512 bytes)
     char Path[512];
 };
+
+
+/**
+ * @brief Callback type for logging messages from the library.
+ *
+ * This callback is invoked by the library to send log messages to Unity.
+ * It allows Unity to handle logging through its own logging system,
+ * enabling proper integration with Unity's console and debugging tools.
+ *
+ * @param Level The severity level of the log message (e.g., Info, Warning, Error).
+ * @param Message Null-terminated string containing the log message text.
+ */
+typedef void (*GCU_LogCallback)(int Level, const char* Message);
 
 /**
  * @brief Callback type for allocating a new engine device.
