@@ -19,7 +19,12 @@ namespace GCU {
 	     */
         static FUnityDeviceRegistry* Get();
 
-        /** Destroys the singleton and releases all registered device libraries. */
+        /**
+         * Shuts down the static instance of the FUnityDeviceRegistry class, releasing the memory
+         * associated with it. This method ensures that the singleton instance is properly cleaned
+         * up when it is no longer needed, preventing potential memory leaks or lingering references.
+         * Should be called during the application's shutdown sequence to free resources.
+         */
         static void Shutdown();
 	    /**
 	     * Initializes the singleton instance of the FUnityDeviceRegistry class. This method
