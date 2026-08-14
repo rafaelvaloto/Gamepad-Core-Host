@@ -84,7 +84,7 @@ struct FDeviceContext;
  * @param BytesRead Pointer to an integer that will receive the number of bytes actually read.
  * @return std::int32_t Number of bytes actually read.
  */
-typedef int (*PlatformReadCallback)(std::uint64_t Handle, std::uint8_t *Buffer, std::int32_t Length,
+typedef std::int32_t (*PlatformReadCallback)(std::uint64_t Handle, std::uint8_t *Buffer, std::int32_t Length,
                                              std::int32_t *BytesRead);
 
 /**
@@ -98,10 +98,10 @@ typedef int (*PlatformReadCallback)(std::uint64_t Handle, std::uint8_t *Buffer, 
  * @param Buffer Pointer to the buffer to read data into.
  * @param Length Maximum number of bytes that can be read into the buffer.
  * @param BytesWritten Pointer to the device context containing output data to write.
- * @return int Number of bytes actually written.
+ * @return std::int32_t Number of bytes actually written.
  */
-typedef int (*PlatformWriteCallback)(std::uint64_t Handle, const std::uint8_t *Buffer, std::int32_t Length,
-                                      std::int32_t *BytesWritten);
+typedef std::int32_t (*PlatformWriteCallback)(std::uint64_t Handle, const std::uint8_t *Buffer, std::int32_t Length,
+                                              std::int32_t *BytesWritten);
 
 /**
  * @brief Callback type for detecting connected platform devices.
@@ -112,9 +112,23 @@ typedef int (*PlatformWriteCallback)(std::uint64_t Handle, const std::uint8_t *B
  *
  * @param Devices Array of device contexts to populate with detected devices.
  * @param MaxDevices Maximum number of devices that can be stored in the array.
- * @return The number of devices detected and populated in the array.
+ * @return std::int32_t The number of devices detected and populated in the array.
  */
-typedef int (*PlatformDetectCallback)(GCUDeviceDescriptor *Devices, int MaxDevices);
+typedef std::int32_t (*PlatformDetectCallback)(GCUDeviceDescriptor *Devices, int MaxDevices);
+
+/**
+ * @brief Callback type for configuring platform device features.
+ *
+ * This callback is invoked to configure specific features or settings on a platform-specific device.
+ * It should send the configuration data to the device and report the number of bytes processed.
+ *
+ * @param Handle Handle to the device to configure.
+ * @param Buffer Pointer to the buffer containing the configuration data to send.
+ * @param Length Number of bytes in the configuration buffer.
+ * @param Bytes Pointer to an integer that will receive the number of bytes processed.
+ */
+typedef void (*PlatformConfigureFeaturesCallback)(std::uint64_t Handle, const std::uint8_t *Buffer, std::int32_t Length,
+                                                  std::int32_t *Bytes);
 
 /**
  * @brief Callback type for creating platform device handle.
@@ -150,8 +164,9 @@ typedef void (*PlatformInvalidateHandleCallback)(std::uint64_t Handle);
  * @param Length The length of the audio data buffer in bytes.
  * @param BytesWritten Pointer to an integer that will receive the number of bytes written to the device.
  */
-typedef void (*PlatformProcessAudioHapticCallback)(std::uint64_t Handle, const std::uint8_t *Buffer, std::int32_t Length,
-                                      std::int32_t *BytesWritten);
+typedef void (*PlatformProcessAudioHapticsCallback)(std::uint64_t Handle, const std::uint8_t *Buffer,
+                                                   std::int32_t Length,
+                                                   std::int32_t *BytesWritten);
 
 /**
  * @brief Global variable storing the Unity engine type identifier.
@@ -225,12 +240,21 @@ extern PlatformCreateHandleCallback g_UnityPlatformCreateHandleCallback;
  */
 extern PlatformInvalidateHandleCallback g_UnityPlatformInvalidateHandleCallback;
 
+
+/**
+ * @brief Global callback pointer for platform device feature configuration.
+ *
+ * This callback is invoked to configure specific features or settings on platform-specific devices.
+ * Set during initialization via GCU_InitializePlatformBridge.
+ */
+extern PlatformConfigureFeaturesCallback g_UnityPlatformConfigureFeaturesCallback;
+
 /**
  * @brief Global callback pointer for platform audio haptic processing.
  *
  * This callback is invoked to process audio-based haptic feedback on platform-specific devices.
  * Set during initialization via GCU_InitializePlatformBridge.
  */
-extern PlatformProcessAudioHapticCallback g_UnityPlatformProcessAudioHapticCallback;
+extern PlatformProcessAudioHapticsCallback g_UnityPlatformProcessAudioHapticsCallback;
 
 #endif //GAMEPADCOREUNITY_GAMEPAD_TYPES_API_H

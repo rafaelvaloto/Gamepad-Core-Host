@@ -13,6 +13,7 @@ namespace GCU {
         static void Detect(std::vector<FDeviceContext>& Devices);
         static bool CreateHandle(FDeviceContext* Context);
         static void InvalidateHandle(FDeviceContext* Context);
+        static void ConfigureFeatures(FDeviceContext *Context);
         static void ProcessAudioHaptic(FDeviceContext* Context);
     };
 } // namespace GCU

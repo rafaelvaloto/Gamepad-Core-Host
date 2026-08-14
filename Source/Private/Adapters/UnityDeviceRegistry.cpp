@@ -27,7 +27,7 @@ void GCU_Shutdown() {
     g_UnityPlatformDetectCallback = nullptr;
     g_UnityPlatformCreateHandleCallback = nullptr;
     g_UnityPlatformInvalidateHandleCallback = nullptr;
-    g_UnityPlatformProcessAudioHapticCallback = nullptr;
+    g_UnityPlatformProcessAudioHapticsCallback = nullptr;
     g_UnityEngineTypeId = 0;
     LogCallback = nullptr;
 }

@@ -6,6 +6,7 @@
 #include "GCore/Interfaces/IPlatformHardware.h"
 #include "GCore/Templates/TGenericHardwareInfo.h"
 #include "gamepad_unity_api.h"
+#include "GImplementations/Utils/GamepadSensors.h"
 
 namespace {
     constexpr int MaxDetectedDevices = 64;
@@ -14,9 +15,12 @@ namespace {
 PlatformReadCallback g_UnityPlatformReadCallback = nullptr;
 PlatformWriteCallback g_UnityPlatformWriteCallback = nullptr;
 PlatformDetectCallback g_UnityPlatformDetectCallback = nullptr;
+
 PlatformCreateHandleCallback g_UnityPlatformCreateHandleCallback = nullptr;
 PlatformInvalidateHandleCallback g_UnityPlatformInvalidateHandleCallback = nullptr;
-PlatformProcessAudioHapticCallback g_UnityPlatformProcessAudioHapticCallback = nullptr;
+PlatformConfigureFeaturesCallback g_UnityPlatformConfigureFeaturesCallback = nullptr;
+PlatformProcessAudioHapticsCallback g_UnityPlatformProcessAudioHapticsCallback = nullptr;
+
 
 namespace GCU {
     namespace {
@@ -74,7 +78,7 @@ namespace GCU {
             return;
 
         GCUDeviceDescriptor Descriptors[MaxDetectedDevices]{};
-        const int Count = g_UnityPlatformDetectCallback(Descriptors, MaxDetectedDevices);
+        const auto Count = g_UnityPlatformDetectCallback(Descriptors, MaxDetectedDevices);
 
         Devices.clear();
         for (int i = 0; i < Count && i < MaxDetectedDevices; ++i) {
@@ -86,8 +90,59 @@ namespace GCU {
         }
     }
 
-    bool PlatformBridgePolicy::CreateHandle(FDeviceContext * /*Context*/) {
+    bool PlatformBridgePolicy::CreateHandle(FDeviceContext *Context) {
+        if (!Context)
+            return false;
+
+        ConfigureFeatures(Context);
         return true;
+    }
+
+    void PlatformBridgePolicy::ConfigureFeatures(FDeviceContext *Context) {
+        if (!Context)
+            return;
+
+        std::int32_t BytesRead = 0;
+        const auto Handle = reinterpret_cast<std::uintptr_t>(Context->Handle);
+
+        using namespace FGamepadSensors;
+        FGamepadCalibration Calibration;
+        if (Context->DeviceType == EDSDeviceType::DualShock4)
+        {
+            if (Context->ConnectionType == EDSDeviceConnection::Usb)
+            {
+                unsigned char FeatureBuffer[37] = {0};
+                std::memset(FeatureBuffer, 0, sizeof(FeatureBuffer));
+
+                FeatureBuffer[0] = 0x02;
+                g_UnityPlatformConfigureFeaturesCallback(Handle, FeatureBuffer, sizeof(FeatureBuffer), &BytesRead);
+
+                DualShockCalibrationSensors(FeatureBuffer, Calibration, Context);
+            }
+            else
+            {
+                unsigned char FeatureBuffer[41] = {0};
+                std::memset(FeatureBuffer, 0, sizeof(FeatureBuffer));
+
+                FeatureBuffer[0] = 0x05;
+                g_UnityPlatformConfigureFeaturesCallback(Handle, FeatureBuffer, sizeof(FeatureBuffer), &BytesRead);
+
+                DualShockCalibrationSensors(FeatureBuffer, Calibration, Context);
+            }
+
+            Context->Calibration = Calibration;
+        }
+        else
+        {
+            unsigned char FeatureBuffer[41] = {0};
+            std::memset(FeatureBuffer, 0, sizeof(FeatureBuffer));
+
+            FeatureBuffer[0] = 0x05;
+            g_UnityPlatformConfigureFeaturesCallback(Handle, FeatureBuffer, sizeof(FeatureBuffer), &BytesRead);
+
+            DualSenseCalibrationSensors(FeatureBuffer, Calibration, Context);
+            Context->Calibration = Calibration;
+        }
     }
 
     void PlatformBridgePolicy::InvalidateHandle(FDeviceContext *Context) {
@@ -121,14 +176,15 @@ void GCU_InitializePlatformBridge(
     const PlatformDetectCallback detectCallback,
     const PlatformCreateHandleCallback createHandleCallback,
     const PlatformInvalidateHandleCallback invalidateHandleCallback,
-    const PlatformProcessAudioHapticCallback processAudioHapticCallback) {
+    const PlatformConfigureFeaturesCallback configureFeaturesCallback,
+    const PlatformProcessAudioHapticsCallback processAudioHapticsCallback) {
     g_UnityPlatformReadCallback = readCallback;
     g_UnityPlatformWriteCallback = writeCallback;
     g_UnityPlatformDetectCallback = detectCallback;
     g_UnityPlatformCreateHandleCallback = createHandleCallback;
     g_UnityPlatformInvalidateHandleCallback = invalidateHandleCallback;
-    g_UnityPlatformProcessAudioHapticCallback = processAudioHapticCallback;
+    g_UnityPlatformConfigureFeaturesCallback = configureFeaturesCallback;
+    g_UnityPlatformProcessAudioHapticsCallback = processAudioHapticsCallback;
 
-    IPlatformHardware::SetInstance(
-        std::make_unique<GamepadCore::TGenericHardwareInfo<GCU::PlatformBridgePolicy> >());
+    IPlatformHardware::SetInstance(std::make_unique<GamepadCore::TGenericHardwareInfo<GCU::PlatformBridgePolicy> >());
 }
