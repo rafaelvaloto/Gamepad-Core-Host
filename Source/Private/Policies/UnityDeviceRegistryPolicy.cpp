@@ -21,14 +21,16 @@ void GCU_InitializeDeviceRegistryPolicy(const int TypeId, const AllocEngineDevic
 
 namespace GCU {
     UnityDeviceRegistryPolicy::EngineIdType UnityDeviceRegistryPolicy::AllocEngineDevice() {
-        return g_UnityAllocDeviceCallback();
+        return g_UnityAllocDeviceCallback ? g_UnityAllocDeviceCallback() : -1;
     }
 
     void UnityDeviceRegistryPolicy::DisconnectDevice(EngineIdType id) {
-        g_UnityDisconnectDeviceCallback(id);
+        if (g_UnityDisconnectDeviceCallback)
+            g_UnityDisconnectDeviceCallback(id);
     }
 
     void UnityDeviceRegistryPolicy::DispatchNewGamepad(EngineIdType id) {
-        g_UnityDispatchDeviceCallback(id);
+        if (g_UnityDispatchDeviceCallback)
+            g_UnityDispatchDeviceCallback(id);
     }
 } // GCU

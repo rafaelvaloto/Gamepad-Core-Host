@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 4.2)
 
-project(GamepadCoreUnity)
+project(GamepadCoreUnity VERSION 1.0.0)
+
+set(GAMEPADCOREUNITY_VERSION "${PROJECT_VERSION}")
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -21,3 +23,7 @@ target_include_directories(GamepadCoreUnity
 )
 
 target_link_libraries(GamepadCoreUnity PRIVATE GamepadCore)
+
+target_compile_definitions(GamepadCoreUnity PRIVATE
+        GCU_VERSION_STRING="${GAMEPADCOREUNITY_VERSION}"
+)

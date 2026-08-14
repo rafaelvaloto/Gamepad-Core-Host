@@ -6,7 +6,19 @@
 #include "gamepad_types_api.h"
 #include "GCore/Types/Structs/Context/InputContext.h"
 
+/** Callback used by the bridge to forward native log messages to the host. */
+typedef void (*GCU_LogCallback)(int Level, const char* Message);
+
 extern "C" {
+    /** Shuts down the bridge and releases all registered devices and platform resources. */
+    __declspec(dllexport) void GCU_Shutdown();
+
+    /** Returns the bridge version as a null-terminated string owned by the DLL. */
+    __declspec(dllexport) const char* GCU_GetVersion();
+
+    /** Registers the callback that receives native log messages. Pass nullptr to disable it. */
+    __declspec(dllexport) void GCU_SetLogCallback(GCU_LogCallback Callback);
+
     /**
      * @brief Initializes the device registry policy with Unity callbacks.
      *

@@ -17,7 +17,10 @@ namespace GCU {
 	     * @return A pointer to the singleton instance of UDeviceContainerManager. Returns nullptr
 	     *         if the instance has not been initialized.
 	     */
-	    static FUnityDeviceRegistry* Get();
+        static FUnityDeviceRegistry* Get();
+
+        /** Destroys the singleton and releases all registered device libraries. */
+        static void Shutdown();
 	    /**
 	     * Initializes the singleton instance of the FUnityDeviceRegistry class. This method
 	     * must be called before accessing the instance through Get(). It creates the registry
