@@ -19,45 +19,85 @@ PlatformInvalidateHandleCallback g_UnityPlatformInvalidateHandleCallback = nullp
 PlatformProcessAudioHapticCallback g_UnityPlatformProcessAudioHapticCallback = nullptr;
 
 namespace GCU {
-    void PlatformBridgePolicy::Read(FDeviceContext* Context) {
-        if (g_UnityPlatformReadCallback)
-            g_UnityPlatformReadCallback(Context);
+
+    namespace {
+        FDeviceContext MakeDeviceContext(const GCUDeviceDescriptor &Descriptor) {
+            FDeviceContext Context{};
+            Context.Handle =
+                    reinterpret_cast<FPlatformDeviceHandle>(
+                        static_cast<std::uintptr_t>(Descriptor.Handle));
+
+            Context.Path = Descriptor.Path;
+            Context.DeviceType =
+                    static_cast<EDSDeviceType>(Descriptor.DeviceType);
+            Context.ConnectionType =
+                    static_cast<EDSDeviceConnection>(Descriptor.ConnectionType);
+            Context.IsConnected =
+                    Descriptor.IsConnected != 0;
+
+            return Context;
+        }
     }
 
-    void PlatformBridgePolicy::Write(FDeviceContext* Context) {
-        if (g_UnityPlatformWriteCallback)
-            g_UnityPlatformWriteCallback(Context);
+    void PlatformBridgePolicy::Read(FDeviceContext *Context) {
+        if (!Context || !Context->IsConnected)
+            return;
+
+        std::uint8_t *Buffer = Context->Buffer;
+        const auto Handle = reinterpret_cast<std::uintptr_t>(Context->Handle);
+
+        std::int32_t Length = 64;
+        if (Context->DeviceType == EDSDeviceType::DualShock4 &&
+            Context->ConnectionType == EDSDeviceConnection::Bluetooth) {
+            Buffer = Context->BufferDS4;
+            Length = 547;
+        } else if (Context->ConnectionType == EDSDeviceConnection::Bluetooth) {
+            Length = 78;
+        }
+
+        std::int32_t BytesRead = 0;
+        if (const std::int32_t Result = g_UnityPlatformReadCallback(Handle, Buffer, Length, &BytesRead); Result == 0) {
+            InvalidateHandle(Context);
+        }
     }
 
-    void PlatformBridgePolicy::Detect(std::vector<FDeviceContext>& Devices) {
+    void PlatformBridgePolicy::Write(FDeviceContext *Context) {
+        if (!Context || !Context->IsConnected)
+            return;
+
+        std::int32_t BytesWritten = 0;
+        const auto Handle = reinterpret_cast<std::uintptr_t>(Context->Handle);
+        const int Length = Context->DeviceType == EDSDeviceType::DualShock4 ? 32 : 74;
+        if (!g_UnityPlatformWriteCallback(Handle, Context->GetRawOutputBuffer(), Length, &BytesWritten)) {
+            InvalidateHandle(Context);
+        }
+    }
+
+    void PlatformBridgePolicy::Detect(std::vector<FDeviceContext> &Devices) {
         if (!g_UnityPlatformDetectCallback)
             return;
 
-        Devices.resize(MaxDetectedDevices);
-        const int DetectedCount = g_UnityPlatformDetectCallback(Devices.data(), MaxDetectedDevices);
-        if (DetectedCount <= 0) {
-            Devices.clear();
-            return;
+        GCUDeviceDescriptor Descriptors[MaxDetectedDevices]{};
+        const int Count = g_UnityPlatformDetectCallback(Descriptors, MaxDetectedDevices);
+
+        Devices.clear();
+        for (int i = 0; i < Count && i < MaxDetectedDevices; ++i) {
+            Devices.push_back(MakeDeviceContext(Descriptors[i]));
         }
 
-        Devices.resize(static_cast<size_t>(DetectedCount > MaxDetectedDevices
-                                                ? MaxDetectedDevices
-                                                : DetectedCount));
+        for (int i = 0; i < Count && i < 64; ++i) {
+            Devices.push_back(MakeDeviceContext(Descriptors[i]));
+        }
     }
 
-    bool PlatformBridgePolicy::CreateHandle(FDeviceContext* Context) {
-        return g_UnityPlatformCreateHandleCallback &&
-               g_UnityPlatformCreateHandleCallback(Context);
+    bool PlatformBridgePolicy::CreateHandle(FDeviceContext * /*Context*/) {
+        return true;
     }
 
-    void PlatformBridgePolicy::InvalidateHandle(FDeviceContext* Context) {
-        if (g_UnityPlatformInvalidateHandleCallback)
-            g_UnityPlatformInvalidateHandleCallback(Context);
+    void PlatformBridgePolicy::InvalidateHandle(FDeviceContext * /*Context*/) {
     }
 
-    void PlatformBridgePolicy::ProcessAudioHaptic(FDeviceContext* Context) {
-        if (g_UnityPlatformProcessAudioHapticCallback)
-            g_UnityPlatformProcessAudioHapticCallback(Context);
+    void PlatformBridgePolicy::ProcessAudioHaptic(FDeviceContext *Context) {
     }
 } // namespace GCU
 
@@ -76,5 +116,5 @@ void GCU_InitializePlatformBridge(
     g_UnityPlatformProcessAudioHapticCallback = processAudioHapticCallback;
 
     IPlatformHardware::SetInstance(
-        std::make_unique<GamepadCore::TGenericHardwareInfo<GCU::PlatformBridgePolicy>>());
+        std::make_unique<GamepadCore::TGenericHardwareInfo<GCU::PlatformBridgePolicy> >());
 }
