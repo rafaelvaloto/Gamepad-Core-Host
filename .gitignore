@@ -1,0 +1,31 @@
+# CMake and build output
+cmake-build-*/
+build/
+out/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+
+# IDE files
+.idea/
+.vs/
+*.user
+*.suo
+
+# Compiled binaries and intermediate files
+*.dll
+*.so
+*.dylib
+*.exe
+*.lib
+*.a
+*.obj
+*.o
+*.pdb
+*.ilk
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,14 @@
+# Build output generated inside third-party dependencies
+*/cmake-build-*/
+*/build/
+*/out/
+*/.idea/
+*/CMakeFiles/
+*/CMakeCache.txt
+*/cmake_install.cmake
+
+# Generated binaries
+*/bin/
+*/lib/
+*/Debug/
+*/Release/
