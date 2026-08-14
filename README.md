@@ -23,7 +23,7 @@ Requirements:
 Initialize the submodule and configure the project:
 
 ```bash
-git submodule update --init --recursive
+git submodule update --init
 cmake -S . -B build
 cmake --build build
 ```
