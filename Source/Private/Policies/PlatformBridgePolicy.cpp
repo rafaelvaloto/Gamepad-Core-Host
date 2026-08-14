@@ -19,7 +19,6 @@ PlatformInvalidateHandleCallback g_UnityPlatformInvalidateHandleCallback = nullp
 PlatformProcessAudioHapticCallback g_UnityPlatformProcessAudioHapticCallback = nullptr;
 
 namespace GCU {
-
     namespace {
         FDeviceContext MakeDeviceContext(const GCUDeviceDescriptor &Descriptor) {
             FDeviceContext Context{};
@@ -28,12 +27,9 @@ namespace GCU {
                         static_cast<std::uintptr_t>(Descriptor.Handle));
 
             Context.Path = Descriptor.Path;
-            Context.DeviceType =
-                    static_cast<EDSDeviceType>(Descriptor.DeviceType);
-            Context.ConnectionType =
-                    static_cast<EDSDeviceConnection>(Descriptor.ConnectionType);
-            Context.IsConnected =
-                    Descriptor.IsConnected != 0;
+            Context.IsConnected = Descriptor.IsConnected != 0;
+            Context.DeviceType = static_cast<EDSDeviceType>(Descriptor.DeviceType);
+            Context.ConnectionType = static_cast<EDSDeviceConnection>(Descriptor.ConnectionType);
 
             return Context;
         }
@@ -94,11 +90,29 @@ namespace GCU {
         return true;
     }
 
-    void PlatformBridgePolicy::InvalidateHandle(FDeviceContext * /*Context*/) {
+    void PlatformBridgePolicy::InvalidateHandle(FDeviceContext *Context) {
+        if (!Context)
+            return;
+
+        const auto Handle = reinterpret_cast<std::uintptr_t>(Context->Handle);
+        if (Context->Handle != INVALID_PLATFORM_HANDLE) {
+            if (g_UnityPlatformInvalidateHandleCallback) {
+                g_UnityPlatformInvalidateHandleCallback(Handle);
+            }
+
+            Context->Handle = INVALID_PLATFORM_HANDLE;
+        }
+
+        Context->IsConnected = false;
+        Context->Path.clear();
+
+        std::memset(Context->Buffer, 0, sizeof(Context->Buffer));
+        std::memset(Context->BufferDS4, 0, sizeof(Context->BufferDS4));
+        std::memset(Context->BufferHapitcs, 0, sizeof(Context->BufferHapitcs));
+        std::memset(Context->GetRawOutputBuffer(), 0, 78);
     }
 
-    void PlatformBridgePolicy::ProcessAudioHaptic(FDeviceContext *Context) {
-    }
+    void PlatformBridgePolicy::ProcessAudioHaptic(FDeviceContext *Context) {}
 } // namespace GCU
 
 void GCU_InitializePlatformBridge(

@@ -84,7 +84,7 @@ struct FDeviceContext;
  * @param BytesRead Pointer to an integer that will receive the number of bytes actually read.
  * @return std::int32_t Number of bytes actually read.
  */
-typedef std::int32_t (*PlatformReadCallback)(std::uint64_t Handle, std::uint8_t *Buffer, std::int32_t Length,
+typedef int (*PlatformReadCallback)(std::uint64_t Handle, std::uint8_t *Buffer, std::int32_t Length,
                                              std::int32_t *BytesRead);
 
 /**
@@ -98,9 +98,9 @@ typedef std::int32_t (*PlatformReadCallback)(std::uint64_t Handle, std::uint8_t 
  * @param Buffer Pointer to the buffer to read data into.
  * @param Length Maximum number of bytes that can be read into the buffer.
  * @param BytesWritten Pointer to the device context containing output data to write.
- * @return std::int32_t Number of bytes actually written.
+ * @return int Number of bytes actually written.
  */
-typedef std::int32_t (*PlatformWriteCallback)(std::uint64_t Handle, const std::uint8_t *Buffer, std::int32_t Length,
+typedef int (*PlatformWriteCallback)(std::uint64_t Handle, const std::uint8_t *Buffer, std::int32_t Length,
                                       std::int32_t *BytesWritten);
 
 /**
@@ -123,10 +123,10 @@ typedef int (*PlatformDetectCallback)(GCUDeviceDescriptor *Devices, int MaxDevic
  * for a device. It should establish the connection to the hardware and prepare
  * the device for reading and writing operations.
  *
- * @param deviceContext Pointer to the device context for which to create a handle.
+ * @param Device Pointer to the device descriptor for which to create a handle.
  * @return True if the handle was successfully created, false otherwise.
  */
-typedef bool (*PlatformCreateHandleCallback)(FDeviceContext *);
+typedef int (*PlatformCreateHandleCallback)(GCUDeviceDescriptor *Device);
 
 /**
  * @brief Callback type for invalidating platform device handle.
@@ -134,9 +134,9 @@ typedef bool (*PlatformCreateHandleCallback)(FDeviceContext *);
  * This callback is invoked to invalidate and clean up a platform-specific device handle.
  * It should close the connection to the hardware and release any associated resources.
  *
- * @param deviceContext Pointer to the device context whose handle should be invalidated.
+ * @param Handle The handle to be invalidated.
  */
-typedef void (*PlatformInvalidateHandleCallback)(FDeviceContext *);
+typedef void (*PlatformInvalidateHandleCallback)(std::uint64_t Handle);
 
 /**
  * @brief Callback type for processing audio-based haptic feedback.
@@ -145,9 +145,13 @@ typedef void (*PlatformInvalidateHandleCallback)(FDeviceContext *);
  * It should handle the conversion and transmission of audio data to the device's
  * haptic actuators.
  *
- * @param deviceContext Pointer to the device context for which to process haptic feedback.
+ * @param Handle The handle of the device for which to process haptic feedback.
+ * @param Buffer Pointer to the audio data buffer containing the haptic feedback.
+ * @param Length The length of the audio data buffer in bytes.
+ * @param BytesWritten Pointer to an integer that will receive the number of bytes written to the device.
  */
-typedef void (*PlatformProcessAudioHapticCallback)(FDeviceContext *);
+typedef void (*PlatformProcessAudioHapticCallback)(std::uint64_t Handle, const std::uint8_t *Buffer, std::int32_t Length,
+                                      std::int32_t *BytesWritten);
 
 /**
  * @brief Global variable storing the Unity engine type identifier.
