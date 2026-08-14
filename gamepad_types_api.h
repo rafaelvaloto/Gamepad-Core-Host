@@ -63,16 +63,6 @@ typedef void (*DispatchNewGamepadCallback)(int);
 typedef void (*DisconnectDeviceCallback)(int);
 
 /**
- * @brief Represents the context for a specific input device.
- *
- * This structure encapsulates the state and configuration for a single input device,
- * such as a gamepad. It is primarily managed by the PlatformBridgePolicy class to
- * perform operations such as reading, writing, and detecting device states, as well
- * as creating and invalidating device handles.
- */
-struct FDeviceContext;
-
-/**
  * @brief Callback type for reading platform device state.
  *
  * This callback is invoked to read the current state from a platform-specific device.

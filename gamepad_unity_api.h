@@ -53,7 +53,8 @@ extern "C" {
      * @param detectCallback                Callback invoked for detecting connected platform devices.
      * @param createHandleCallback          Callback invoked to create a handle for a platform device.
      * @param invalidateHandleCallback      Callback invoked to invalidate a handle for a platform device.
-     * @param processAudioHapticCallback    Callback invoked to process audio-based haptic feedback.
+     * @param configureHandleCallback       Callback invoked to configure features for a platform device.
+     * @param processAudioHapticsCallback    Callback invoked to process audio-based haptics feedback.
      */
     __declspec(dllexport) void GCU_InitializePlatformBridge(
         PlatformReadCallback readCallback,
@@ -61,7 +62,8 @@ extern "C" {
         PlatformDetectCallback detectCallback,
         PlatformCreateHandleCallback createHandleCallback,
         PlatformInvalidateHandleCallback invalidateHandleCallback,
-        PlatformProcessAudioHapticCallback processAudioHapticCallback
+        PlatformConfigureFeaturesCallback configureHandleCallback,
+        PlatformProcessAudioHapticsCallback processAudioHapticsCallback
     );
 
     /**
