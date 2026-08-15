@@ -3,6 +3,7 @@
 // All rights reserved.
 
 #include "Adapters/UnityDeviceRegistry.h"
+#include <iostream>
 #include "gamepad_unity_api.h"
 #include "GCore/Interfaces/IPlatformHardware.h"
 
@@ -13,7 +14,17 @@
 namespace {
     constexpr char GCU_VERSION[] = GCU_VERSION_STRING;
     GCU_LogCallback LogCallback = nullptr;
+
+    GCUDeviceDescriptor MakeDeviceDescriptor(FDeviceContext* Context) {
+        GCUDeviceDescriptor Descriptor{};
+        Descriptor.Handle = reinterpret_cast<std::uint64_t>(Context->Handle);
+        Descriptor.IsConnected = Context->IsConnected != 0;
+        Descriptor.DeviceType = static_cast<std::int32_t>(Context->DeviceType);
+        Descriptor.ConnectionType = static_cast<std::int32_t>(Context->ConnectionType);
+        return Descriptor;
+    }
 }
+
 
 void GCU_Shutdown() {
     GCU::FUnityDeviceRegistry::Shutdown();
@@ -57,8 +68,8 @@ void GCU_UpdateInput(const int DeviceId, const float DeltaTime) {
     }
 }
 
-bool GCU_GetInputState(const int DeviceId, FInputContext* InputState) {
-    if (!InputState) {
+bool GCU_GetInputState(const int DeviceId, FInputContext* OutInputState) {
+    if (!OutInputState) {
         return false;
     }
 
@@ -77,7 +88,27 @@ bool GCU_GetInputState(const int DeviceId, FInputContext* InputState) {
         return false;
     }
 
-    *InputState = *DeviceContext->GetInputState();
+    *OutInputState = *DeviceContext->GetInputState();
+    return true;
+}
+
+bool GCU_GetDeviceDescriptor(int DeviceId, GCUDeviceDescriptor* OutDescriptor) {
+    GCU::FUnityDeviceRegistry* Registry = GCU::FUnityDeviceRegistry::Get();
+    if (!Registry) {
+        return false;
+    }
+
+    IGamepadBase* Gamepad = Registry->GetLibrary(DeviceId);
+    if (!Gamepad) {
+        return false;
+    }
+
+    FDeviceContext* DeviceContext = Gamepad->GetMutableDeviceContext();
+    if (!DeviceContext) {
+        return false;
+    }
+
+    *OutDescriptor = MakeDeviceDescriptor(DeviceContext);
     return true;
 }
 

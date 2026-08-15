@@ -96,4 +96,12 @@ extern "C" {
      * @return True when the device and destination are valid; false otherwise.
      */
     __declspec(dllexport) bool GCU_GetInputState(int DeviceId, FInputContext* InputState);
+
+    /** Retrieves the descriptor for a specific device based on its unique identifier.
+     *
+     * @param DeviceId The unique identifier of the device whose descriptor is being requested.
+     * @param OutDescriptor Pointer to a GCUDeviceDescriptor structure where the device details will be stored.
+     * @return True if the device descriptor is successfully retrieved; false otherwise.
+     */
+    __declspec(dllexport) bool GCU_GetDeviceDescriptor(int DeviceId, GCUDeviceDescriptor* OutDescriptor);
 }
