@@ -1,11 +1,11 @@
-﻿// Project: Gamepad-Core-Unity
+// Project: Gamepad-Core-Host
 // Copyright (c) 2026 valoto.games
 // All rights reserved.
 #pragma once
 #include <functional>
 
-namespace GCU {
-    struct UnityDeviceRegistryPolicy {
+namespace GCH {
+    struct DeviceRegistryPolicy {
         using EngineIdType = int;
 
         static EngineIdType AllocEngineDevice();
@@ -17,4 +17,4 @@ namespace GCU {
             size_t operator()(const EngineIdType& id) const { return std::hash<EngineIdType>{}(id); }
         };
     };
-} // GCU
+} // GCH

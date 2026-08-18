@@ -1,18 +1,18 @@
-﻿// Project: Gamepad-Core-Unity
+// Project: Gamepad-Core-Host
 // Copyright (c) 2026 valoto.games
 // All rights reserved.
 #pragma once
 #include "GCore/Templates/TBasicDeviceRegistry.h"
-#include "Policies/UnityDeviceRegistryPolicy.h"
+#include "Policies/DeviceRegistryPolicy.h"
 #include <memory>
 
-namespace GCU {
-    class FUnityDeviceRegistry : public GamepadCore::TBasicDeviceRegistry<UnityDeviceRegistryPolicy> {
+namespace GCH {
+    class FDeviceRegistry : public GamepadCore::TBasicDeviceRegistry<DeviceRegistryPolicy> {
     public:
-        ~FUnityDeviceRegistry() override;
+        ~FDeviceRegistry() override;
 
         /**
-         * Shuts down the static instance of the FUnityDeviceRegistry class, releasing the memory
+         * Shuts down the static instance of the FDeviceRegistry class, releasing the memory
          * associated with it. This method ensures that the singleton instance is properly cleaned
          * up when it is no longer needed, preventing potential memory leaks or lingering references.
          * Should be called during the application's shutdown sequence to free resources.
@@ -27,11 +27,11 @@ namespace GCU {
          * @return A pointer to the singleton instance of UDeviceContainerManager. Returns nullptr
          *         if the instance has not been initialized.
          */
-        static FUnityDeviceRegistry *Get();
+        static FDeviceRegistry *Get();
 
     private:
-        FUnityDeviceRegistry();
+        FDeviceRegistry();
 
-        static std::unique_ptr<FUnityDeviceRegistry> Instance;
+        static std::unique_ptr<FDeviceRegistry> Instance;
     };
-} // GCU
+} // GCH

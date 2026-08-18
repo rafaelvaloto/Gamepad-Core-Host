@@ -1,15 +1,15 @@
-// Project: Gamepad-Core-Unity
+// Project: Gamepad-Core-Host
 // Copyright (c) 2026 valoto.games
 // All rights reserved.
 
 #include "Policies/PlatformBridgePolicy.h"
 #include <cstring>
-#include "gamepad_types_api.h"
+#include "Types/GCHTypes.h"
 #include "GCore/Templates/TAudioDeviceRegistry.h"
-#include "Ultils/MakeTypes.h"
+#include "Types/MakeTypes.h"
 #include "GImplementations/Utils/GamepadSensors.h"
 
-namespace GCU {
+namespace GCH {
 
     void PlatformBridgePolicy::Read(FDeviceContext *Context) {
         if (!Context || !Context->IsConnected)
@@ -20,7 +20,7 @@ namespace GCU {
 
         std::int32_t BytesRead = 0;
         constexpr std::int32_t Length = 78;
-        const std::int32_t Result = g_UnityPlatformReadCallback(Handle, Buffer, Length, &BytesRead);
+        const std::int32_t Result = g_PlatformReadCallback(Handle, Buffer, Length, &BytesRead);
 
         if (Result != 1) {
             InvalidateHandle(Context);
@@ -38,31 +38,31 @@ namespace GCU {
         //size_t InReportLength = Context->DeviceType == EDSDeviceType::DualShock4 ? 32 : 74;
         constexpr std::int32_t OutputReportLength = 78;
         std::int32_t BytesWritten = 0;
-        const std::int32_t Result = g_UnityPlatformWriteCallback(Handle, buffer, OutputReportLength, &BytesWritten);
+        const std::int32_t Result = g_PlatformWriteCallback(Handle, buffer, OutputReportLength, &BytesWritten);
 
         char Message[128];
         std::snprintf(Message,sizeof(Message),"Write file status: %d", Result);
-        GCL::LogCallback(0, Message);
+        GCL::Log(0, Message);
     }
 
     void PlatformBridgePolicy::Detect(std::vector<FDeviceContext> &Devices) {
-        if (!g_UnityPlatformDetectCallback)
+        if (!g_PlatformDetectCallback)
             return;
 
-        GCUDeviceDescriptor Descriptors[MaxDetectedDevices]{};
-        const auto Count = g_UnityPlatformDetectCallback(Descriptors, MaxDetectedDevices);
+        GamepadDeviceDescriptor Descriptors[MaxDetectedDevices]{};
+        const auto Count = g_PlatformDetectCallback(Descriptors, MaxDetectedDevices);
 
-        if (GCL::LogCallback) {
+        if (GCL_DEBUG && GCL::LogCallback) {
             char Message[128];
             std::snprintf(Message,sizeof(Message), "Detected %d devices", Count);
 
-            GCL::LogCallback(0, Message);
+            GCL::Log(0, Message);
         }
 
 
         Devices.clear();
         for (int i = 0; i < Count && i < MaxDetectedDevices; ++i) {
-            GCUDeviceDescriptor &Descriptor = Descriptors[i];
+            GamepadDeviceDescriptor &Descriptor = Descriptors[i];
             FDeviceContext Context = MakeDeviceContext(Descriptor);
             char Message[128];
             std::snprintf(Message,sizeof(Message),
@@ -70,23 +70,30 @@ namespace GCU {
                 Context.ConnectionType,
                 Context.DeviceType
             );
-            GCL::LogCallback(0, Message);
+            GCL::Log(0, Message);
 
             Devices.push_back(Context);
         }
     }
 
     bool PlatformBridgePolicy::CreateHandle(FDeviceContext *Context) {
-        if (!Context)
-            return false;
-
-        GCUDeviceDescriptor OutDescriptor = MakeDeviceDescriptor(Context);
-        if (!g_UnityPlatformCreateHandleCallback(&OutDescriptor)) {
-            GCL::LogCallback(0, "not create handle");
+        if (!Context) {
+            GCL::Error(0, "[Error]: Context is null in CreateHandle");
             return false;
         }
 
-        if (GCL::LogCallback) {
+        if (!g_PlatformCreateHandleCallback) {
+            GCL::Error(0, "[Error]: PlatformCreateHandleCallback is not configured");
+            return false;
+        }
+
+        GamepadDeviceDescriptor OutDescriptor = MakeDeviceDescriptor(Context);
+        if (!g_PlatformCreateHandleCallback(&OutDescriptor)) {
+            GCL::Error(0, "[Error]: Platform handle creation failed");
+            return false;
+        }
+
+        if (GCL_DEBUG && GCL::LogCallback) {
             char Message[128];
             std::snprintf(Message,sizeof(Message),
                 "After callback: Handle=%llu Connected=%d Path=%s",
@@ -95,12 +102,12 @@ namespace GCU {
                 OutDescriptor.Path
                 );
 
-            GCL::LogCallback(0, Message);
+            GCL::Log(0, Message);
         }
 
         *Context = MakeDeviceContext(OutDescriptor);
 
-        if (GCL::LogCallback) {
+        if (GCL_DEBUG && GCL::LogCallback) {
             char Message[128];
             std::snprintf(Message,sizeof(Message),
                 "After set context: Handle=%llu Connected=%d Path=%s",
@@ -108,7 +115,7 @@ namespace GCU {
                 Context->IsConnected,
                 Context->Path.c_str());
 
-            GCL::LogCallback(0, Message);
+            GCL::Log(0, Message);
         }
 
         ConfigureFeatures(Context);
@@ -132,7 +139,7 @@ namespace GCU {
                 std::memset(FeatureBuffer, 0, sizeof(FeatureBuffer));
 
                 FeatureBuffer[0] = 0x02;
-                g_UnityPlatformConfigureFeaturesCallback(Handle, FeatureBuffer, sizeof(FeatureBuffer), &BytesRead);
+                g_PlatformConfigureFeaturesCallback(Handle, FeatureBuffer, sizeof(FeatureBuffer), &BytesRead);
                 DualShockCalibrationSensors(FeatureBuffer, Calibration, Context);
             }
             else
@@ -141,7 +148,7 @@ namespace GCU {
                 std::memset(FeatureBuffer, 0, sizeof(FeatureBuffer));
 
                 FeatureBuffer[0] = 0x05;
-                g_UnityPlatformConfigureFeaturesCallback(Handle, FeatureBuffer, sizeof(FeatureBuffer), &BytesRead);
+                g_PlatformConfigureFeaturesCallback(Handle, FeatureBuffer, sizeof(FeatureBuffer), &BytesRead);
                 DualShockCalibrationSensors(FeatureBuffer, Calibration, Context);
             }
 
@@ -153,12 +160,12 @@ namespace GCU {
             std::memset(FeatureBuffer, 0, sizeof(FeatureBuffer));
 
             FeatureBuffer[0] = 0x05;
-            g_UnityPlatformConfigureFeaturesCallback(Handle, FeatureBuffer, sizeof(FeatureBuffer), &BytesRead);
+            g_PlatformConfigureFeaturesCallback(Handle, FeatureBuffer, sizeof(FeatureBuffer), &BytesRead);
 
             DualSenseCalibrationSensors(FeatureBuffer, Calibration, Context);
             Context->Calibration = Calibration;
 
-            GCL::LogCallback(0, "Configure Features 41, Calibration");
+            GCL::Log(0, "Configure Features 41, Calibration");
         }
     }
 
@@ -168,8 +175,8 @@ namespace GCU {
 
         const auto Handle = reinterpret_cast<std::uintptr_t>(Context->Handle);
         if (Context->Handle != INVALID_PLATFORM_HANDLE) {
-            if (g_UnityPlatformInvalidateHandleCallback) {
-                g_UnityPlatformInvalidateHandleCallback(Handle);
+            if (g_PlatformInvalidateHandleCallback) {
+                g_PlatformInvalidateHandleCallback(Handle);
             }
 
             Context->Handle = INVALID_PLATFORM_HANDLE;
@@ -185,4 +192,4 @@ namespace GCU {
     }
 
     void PlatformBridgePolicy::ProcessAudioHaptic(FDeviceContext *Context) {}
-} // namespace GCU
+} // namespace GCH

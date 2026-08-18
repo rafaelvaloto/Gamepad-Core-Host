@@ -1,11 +1,11 @@
-// Project: Gamepad-Core-Unity
+// Project: Gamepad-Core-Host
 // Copyright (c) 2026 valoto.games
 // All rights reserved.
 #pragma once
 
 #include "GCore/Types/Structs/Context/DeviceContext.h"
 
-namespace GCU {
+namespace GCH {
     class PlatformBridgePolicy {
     public:
         static void Read(FDeviceContext* Context);
@@ -16,4 +16,4 @@ namespace GCU {
         static void ConfigureFeatures(FDeviceContext *Context);
         static void ProcessAudioHaptic(FDeviceContext* Context);
     };
-} // namespace GCU
+} // namespace GCH
