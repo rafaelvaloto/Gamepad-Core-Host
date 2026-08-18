@@ -51,4 +51,6 @@ The platform callbacks are responsible for detecting devices, reading input, wri
 
 ## License
 
+This project uses the [Gamepad-Core library (Dualsense-Multiplatform)](https://github.com/rafaelvaloto/Dualsense-Multiplatform).
+
 Copyright (c) 2026 valoto.games. All rights reserved.
