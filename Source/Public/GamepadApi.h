@@ -5,16 +5,24 @@
 #include "Types/GCHTypes.h"
 #include "GCore/Types/Structs/Context/InputContext.h"
 
+#if defined(_WIN32) || defined(_WIN64)
+    #define GCH_API __declspec(dllexport)
+#elif defined(__unix__) || defined(__GNUC__) || defined(__clang__)
+    #define GCH_API __attribute__((visibility("default")))
+#else
+    #define GCH_API
+#endif
+
 extern "C" {
 
 /** Shuts down the bridge and releases all registered devices and platform resources. */
-__declspec(dllexport) void GCH_Shutdown();
+GCH_API void GCH_Shutdown();
 
 /** Returns the bridge version as a null-terminated string owned by the DLL. */
-__declspec(dllexport) const char *GCH_GetVersion();
+GCH_API const char *GCH_GetVersion();
 
 /** Registers the callback that receives native log messages. Pass nullptr to disable it. */
-__declspec(dllexport) void GCH_SetLogCallback(GamepadLogCallback Callback);
+GCH_API void GCH_SetLogCallback(GamepadLogCallback Callback);
 
 /**
  * @brief Initializes the device registry policy with Host callbacks.
@@ -29,7 +37,7 @@ __declspec(dllexport) void GCH_SetLogCallback(GamepadLogCallback Callback);
  * @param dispatchCallback Callback function for dispatching initialized devices to Host.
  * @param disconnectCallback Callback function for handling device disconnection in Host.
  */
-__declspec(dllexport) void GCH_InitializeDeviceRegistryPolicy(const int TypeId, const AllocEngineDeviceCallback allocCallback,
+GCH_API void GCH_InitializeDeviceRegistryPolicy(const int TypeId, const AllocEngineDeviceCallback allocCallback,
                                                               const DispatchNewGamepadCallback dispatchCallback, const DisconnectDeviceCallback disconnectCallback);
 
 /**
@@ -49,7 +57,7 @@ __declspec(dllexport) void GCH_InitializeDeviceRegistryPolicy(const int TypeId, 
  * @param configureFeaturesCallback       Callback invoked to configure features for a platform device.
  * @param processAudioHapticsCallback    Callback invoked to process audio-based haptics feedback.
  */
-__declspec(dllexport) void GCH_InitializePlatformBridge(
+GCH_API void GCH_InitializePlatformBridge(
     const PlatformReadCallback readCallback,
     const PlatformWriteCallback writeCallback,
     const PlatformDetectCallback detectCallback,
@@ -70,7 +78,7 @@ __declspec(dllexport) void GCH_InitializePlatformBridge(
  *
  * @param DeltaTime The time elapsed since the last frame in seconds.
  */
-__declspec(dllexport) void GCH_DiscoverDevices(const float DeltaTime);
+GCH_API void GCH_DiscoverDevices(const float DeltaTime);
 
 /**
  * @brief Updates the input state of a registered gamepad.
@@ -78,7 +86,7 @@ __declspec(dllexport) void GCH_DiscoverDevices(const float DeltaTime);
  * @param DeviceId The Host/device identifier assigned by the allocation callback.
  * @param DeltaTime The time elapsed since the last frame in seconds.
  */
-__declspec(dllexport) void GCH_UpdateInput(const int DeviceId, const float DeltaTime);
+GCH_API void GCH_UpdateInput(const int DeviceId, const float DeltaTime);
 /**
  * @brief Copies the current input state of a registered gamepad.
  *
@@ -89,7 +97,7 @@ __declspec(dllexport) void GCH_UpdateInput(const int DeviceId, const float Delta
  * @param OutInputState Destination buffer that receives the input state.
  * @return True when the device and destination are valid; false otherwise.
  */
-__declspec(dllexport) bool GCH_GetInputState(const int DeviceId, FInputContext* OutInputState);
+GCH_API bool GCH_GetInputState(const int DeviceId, FInputContext* OutInputState);
 
 /** Retrieves the descriptor for a specific device based on its unique identifier.
  *
@@ -97,5 +105,5 @@ __declspec(dllexport) bool GCH_GetInputState(const int DeviceId, FInputContext* 
  * @param OutDescriptor Pointer to a GamepadDeviceDescriptor structure where the device details will be stored.
  * @return True if the device descriptor is successfully retrieved; false otherwise.
  */
-__declspec(dllexport) bool GCH_GetDeviceDescriptor(int DeviceId, GamepadDeviceDescriptor* OutDescriptor);
+GCH_API bool GCH_GetDeviceDescriptor(int DeviceId, GamepadDeviceDescriptor* OutDescriptor);
 }

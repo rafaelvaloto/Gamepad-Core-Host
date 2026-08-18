@@ -14,7 +14,7 @@
 
 extern "C" {
 
-__declspec(dllexport) void GCH_Shutdown() {
+GCH_API void GCH_Shutdown() {
     GCH::FDeviceRegistry::Shutdown();
     IPlatformHardware::SetInstance(nullptr);
     g_AllocDeviceCallback = nullptr;
@@ -30,15 +30,15 @@ __declspec(dllexport) void GCH_Shutdown() {
     GCL::LogCallback = nullptr;
 }
 
-__declspec(dllexport) const char *GCH_GetVersion() { return GCH_VERSION; }
+GCH_API const char *GCH_GetVersion() { return GCH_VERSION; }
 
-__declspec(dllexport) void GCH_SetLogCallback(const GamepadLogCallback Callback) {
+GCH_API void GCH_SetLogCallback(const GamepadLogCallback Callback) {
     GCL::LogCallback = Callback;
     if (GCL_DEBUG && GCL::LogCallback)
         GCL::Log(0, "GCH_SetLogCallback registered");
 }
 
-__declspec(dllexport) void GCH_InitializeDeviceRegistryPolicy(const int TypeId,
+GCH_API void GCH_InitializeDeviceRegistryPolicy(const int TypeId,
                                                               const AllocEngineDeviceCallback allocCallback,
                                                               const DispatchNewGamepadCallback dispatchCallback,
                                                               const DisconnectDeviceCallback disconnectCallback) {
@@ -48,7 +48,7 @@ __declspec(dllexport) void GCH_InitializeDeviceRegistryPolicy(const int TypeId,
     g_DisconnectDeviceCallback = disconnectCallback;
 }
 
-__declspec(dllexport) void GCH_InitializePlatformBridge(const PlatformReadCallback readCallback,
+GCH_API void GCH_InitializePlatformBridge(const PlatformReadCallback readCallback,
                                                         const PlatformWriteCallback writeCallback,
                                                         const PlatformDetectCallback detectCallback,
                                                         const PlatformCreateHandleCallback createHandleCallback,
@@ -69,11 +69,11 @@ __declspec(dllexport) void GCH_InitializePlatformBridge(const PlatformReadCallba
     (void)GCH::FDeviceRegistry::Get();
 }
 
-__declspec(dllexport) void GCH_DiscoverDevices(const float DeltaTime) {
+GCH_API void GCH_DiscoverDevices(const float DeltaTime) {
     if (auto *Registry = GCH::FDeviceRegistry::Get()) Registry->PlugAndPlay(DeltaTime);
 }
 
-__declspec(dllexport) void GCH_UpdateInput(const int DeviceId, const float DeltaTime) {
+GCH_API void GCH_UpdateInput(const int DeviceId, const float DeltaTime) {
 
     auto *Registry = GCH::FDeviceRegistry::Get();
     if (!Registry) {
@@ -92,7 +92,7 @@ __declspec(dllexport) void GCH_UpdateInput(const int DeviceId, const float Delta
     Gamepad->UpdateInput(0.016f);
 }
 
-__declspec(dllexport) bool GCH_GetInputState(const int DeviceId, FInputContext *OutInputState) {
+GCH_API bool GCH_GetInputState(const int DeviceId, FInputContext *OutInputState) {
     if (!OutInputState) {
         GCL::Error(0, "[Error]: OutInputState is null");
         return false;
