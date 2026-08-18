@@ -2,11 +2,8 @@ cmake_minimum_required(VERSION 4.2)
 
 project(GamepadCoreHost VERSION 1.0.6)
 
-set(GCH_VERSION_STRING "${PROJECT_VERSION}")
-
 set(CMAKE_CXX_STANDARD 20)
-
-option(GCL_DEBUG "Enable Gamepad-Core host logging" OFF)
+option(GCL_DEBUG "Enable Gamepad-Core host logging" ON)
 
 add_subdirectory(3rdParty/Gamepad-Core)
 
@@ -27,6 +24,6 @@ target_include_directories(GamepadCoreHost
 target_link_libraries(GamepadCoreHost PRIVATE GamepadCore)
 
 target_compile_definitions(GamepadCoreHost PRIVATE
-        GCH_VERSION_STRING="${GAMEPADCORE_VERSION}"
+        GCH_VERSION_STRING="${PROJECT_VERSION}"
         GCL_DEBUG=$<BOOL:${GCL_DEBUG}>
 )

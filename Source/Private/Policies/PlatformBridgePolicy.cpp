@@ -17,10 +17,16 @@ namespace GCH {
 
         std::uint8_t *Buffer = Context->Buffer;
         const auto Handle = reinterpret_cast<std::uintptr_t>(Context->Handle);
+        //
+        std::int32_t InputReportLength = 64;
+        if (Context->ConnectionType == EDSDeviceConnection::Bluetooth && Context->DeviceType == EDSDeviceType::DualShock4) {
+            InputReportLength = 547;
+        } else {
+            InputReportLength = Context->ConnectionType == EDSDeviceConnection::Bluetooth ? 78 : 64;
+        }
 
         std::int32_t BytesRead = 0;
-        constexpr std::int32_t Length = 78;
-        const std::int32_t Result = g_PlatformReadCallback(Handle, Buffer, Length, &BytesRead);
+        const std::int32_t Result = g_PlatformReadCallback(Handle, Buffer, InputReportLength, &BytesRead);
 
         if (Result != 1) {
             InvalidateHandle(Context);
@@ -35,14 +41,31 @@ namespace GCH {
 
         unsigned char* buffer = Context->GetRawOutputBuffer();
 
-        //size_t InReportLength = Context->DeviceType == EDSDeviceType::DualShock4 ? 32 : 74;
-        constexpr std::int32_t OutputReportLength = 78;
+
+        std::int32_t OutputReportLength = 32;
+        if (Context->DeviceType == EDSDeviceType::DualShock4)
+        {
+            OutputReportLength = Context->ConnectionType == EDSDeviceConnection::Bluetooth ? 78 : 32;
+        }
+        else
+        {
+            // DualSense
+            OutputReportLength = Context->ConnectionType == EDSDeviceConnection::Bluetooth ? 78 : 74;
+        }
+
+        char Message[128];
+        std::snprintf(Message,sizeof(Message),"OutputReportLength: %d", OutputReportLength);
+        GCL::Log(0, Message);
+
         std::int32_t BytesWritten = 0;
         const std::int32_t Result = g_PlatformWriteCallback(Handle, buffer, OutputReportLength, &BytesWritten);
 
-        char Message[128];
-        std::snprintf(Message,sizeof(Message),"Write file status: %d", Result);
-        GCL::Log(0, Message);
+        if (Result)
+        {
+            char Message[128];
+            std::snprintf(Message,sizeof(Message),"Write file status: %d", Result);
+            GCL::Log(0, Message);
+        }
     }
 
     void PlatformBridgePolicy::Detect(std::vector<FDeviceContext> &Devices) {
@@ -59,18 +82,18 @@ namespace GCH {
             GCL::Log(0, Message);
         }
 
-
         Devices.clear();
         for (int i = 0; i < Count && i < MaxDetectedDevices; ++i) {
             GamepadDeviceDescriptor &Descriptor = Descriptors[i];
             FDeviceContext Context = MakeDeviceContext(Descriptor);
             char Message[128];
             std::snprintf(Message,sizeof(Message),
-            "Detected ConnectionType=%hhd DeviceType=%hhd",
+            "Detected Connection=%hhd Type=%hhd Path:%s",
                 Context.ConnectionType,
-                Context.DeviceType
+                Context.DeviceType,
+                Context.Path.c_str()
             );
-            GCL::Log(0, Message);
+            GCL::Error(0, Message);
 
             Devices.push_back(Context);
         }
