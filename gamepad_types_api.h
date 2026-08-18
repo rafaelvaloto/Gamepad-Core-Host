@@ -5,7 +5,15 @@
 #ifndef GAMEPADCOREUNITY_GAMEPAD_TYPES_API_H
 #define GAMEPADCOREUNITY_GAMEPAD_TYPES_API_H
 
+#include <cstddef>
 #include <cstdint>
+
+#ifndef GCU_VERSION_STRING
+#define GCU_VERSION_STRING "1.0.0"
+#endif
+
+constexpr int MaxDetectedDevices = 64;
+constexpr char GCU_VERSION[] = GCU_VERSION_STRING;
 
 /**
  * @file gamepad_types_api.h
@@ -15,6 +23,7 @@
  * It provides callback types and external variables for device policy management,
  * allowing Unity to control device allocation, dispatch, and disconnection events.
  */
+
 
 
 /**
@@ -38,6 +47,11 @@ struct GCUDeviceDescriptor {
     char Path[512];
 };
 
+static_assert(offsetof(GCUDeviceDescriptor, Handle) == 0);
+static_assert(offsetof(GCUDeviceDescriptor, DeviceType) == 8);
+static_assert(offsetof(GCUDeviceDescriptor, ConnectionType) == 12);
+static_assert(offsetof(GCUDeviceDescriptor, IsConnected) == 16);
+static_assert(offsetof(GCUDeviceDescriptor, Path) == 20);
 
 /**
  * @brief Callback type for logging messages from the library.
@@ -49,7 +63,7 @@ struct GCUDeviceDescriptor {
  * @param Level The severity level of the log message (e.g., Info, Warning, Error).
  * @param Message Null-terminated string containing the log message text.
  */
-typedef void (*GCU_LogCallback)(int Level, const char* Message);
+typedef void (*GCU_LogCallback)(int Level, const char *Message);
 
 /**
  * @brief Callback type for allocating a new engine device.
@@ -92,9 +106,9 @@ typedef void (*DisconnectDeviceCallback)(int);
  * @param Buffer Pointer to the buffer to read data into.
  * @param Length Maximum number of bytes that can be read into the buffer.
  * @param BytesRead Pointer to an integer that will receive the number of bytes actually read.
- * @return std::int32_t Number of bytes actually read.
+ * @return bool Number of bytes actually read.
  */
-typedef std::int32_t (*PlatformReadCallback)(std::uint64_t Handle, std::uint8_t *Buffer, std::int32_t Length,
+typedef bool (*PlatformReadCallback)(std::uint64_t Handle, std::uint8_t *Buffer, std::int32_t Length,
                                              std::int32_t *BytesRead);
 
 /**
@@ -108,9 +122,9 @@ typedef std::int32_t (*PlatformReadCallback)(std::uint64_t Handle, std::uint8_t 
  * @param Buffer Pointer to the buffer to read data into.
  * @param Length Maximum number of bytes that can be read into the buffer.
  * @param BytesWritten Pointer to the device context containing output data to write.
- * @return std::int32_t Number of bytes actually written.
+ * @return bool Number of bytes actually written.
  */
-typedef std::int32_t (*PlatformWriteCallback)(std::uint64_t Handle, const std::uint8_t *Buffer, std::int32_t Length,
+typedef bool (*PlatformWriteCallback)(std::uint64_t Handle, std::uint8_t *Buffer, std::int32_t Length,
                                               std::int32_t *BytesWritten);
 
 /**
@@ -147,10 +161,9 @@ typedef void (*PlatformConfigureFeaturesCallback)(std::uint64_t Handle, const st
  * for a device. It should establish the connection to the hardware and prepare
  * the device for reading and writing operations.
  *
- * @param Device Pointer to the device descriptor for which to create a handle.
  * @return True if the handle was successfully created, false otherwise.
  */
-typedef int (*PlatformCreateHandleCallback)(GCUDeviceDescriptor *Device);
+typedef bool (*PlatformCreateHandleCallback)(GCUDeviceDescriptor *Device);
 
 /**
  * @brief Callback type for invalidating platform device handle.
@@ -175,8 +188,8 @@ typedef void (*PlatformInvalidateHandleCallback)(std::uint64_t Handle);
  * @param BytesWritten Pointer to an integer that will receive the number of bytes written to the device.
  */
 typedef void (*PlatformProcessAudioHapticsCallback)(std::uint64_t Handle, const std::uint8_t *Buffer,
-                                                   std::int32_t Length,
-                                                   std::int32_t *BytesWritten);
+                                                    std::int32_t Length,
+                                                    std::int32_t *BytesWritten);
 
 /**
  * @brief Global variable storing the Unity engine type identifier.
@@ -266,5 +279,23 @@ extern PlatformConfigureFeaturesCallback g_UnityPlatformConfigureFeaturesCallbac
  * Set during initialization via GCU_InitializePlatformBridge.
  */
 extern PlatformProcessAudioHapticsCallback g_UnityPlatformProcessAudioHapticsCallback;
+
+namespace GCL {
+    inline GCU_LogCallback LogCallback = nullptr;
+}
+
+inline PlatformReadCallback g_UnityPlatformReadCallback = nullptr;
+inline PlatformWriteCallback g_UnityPlatformWriteCallback = nullptr;
+inline PlatformDetectCallback g_UnityPlatformDetectCallback = nullptr;
+
+inline PlatformCreateHandleCallback g_UnityPlatformCreateHandleCallback = nullptr;
+inline PlatformInvalidateHandleCallback g_UnityPlatformInvalidateHandleCallback = nullptr;
+inline PlatformConfigureFeaturesCallback g_UnityPlatformConfigureFeaturesCallback = nullptr;
+inline PlatformProcessAudioHapticsCallback g_UnityPlatformProcessAudioHapticsCallback = nullptr;
+
+inline int g_UnityEngineTypeId;
+inline AllocEngineDeviceCallback g_UnityAllocDeviceCallback = nullptr;
+inline DispatchNewGamepadCallback g_UnityDispatchDeviceCallback = nullptr;
+inline DisconnectDeviceCallback g_UnityDisconnectDeviceCallback = nullptr;
 
 #endif //GAMEPADCOREUNITY_GAMEPAD_TYPES_API_H
