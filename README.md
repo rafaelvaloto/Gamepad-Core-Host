@@ -1,68 +1,76 @@
-# Gamepad-Core Host Bridge
+# 🎮 Gamepad-Core Host Bridge
 
-A Gamepad-Core Host Bridge é uma biblioteca nativa em C++ que expõe a funcionalidade do Gamepad-Core através de uma API de alto nível compatível com C. A versão atual do projeto é 1.0.6[cite: 2].
+**Gamepad-Core Host Bridge** is a native C++ library that exposes the functionality of Gamepad-Core through a high-level, C-compatible API. The current project version is **1.0.6**.
 
-A API exportada foi projetada para ser consumida pelo Host através de C# P/Invoke, mas também pode ser utilizada por outras linguagens que suportem bibliotecas dinâmicas nativas e callbacks de ponteiro de função.
-
----
-
-## Funcionalidades
-
-* Integração de registro de dispositivos para o Host ou outra engine.
-* Callbacks de ponte da plataforma para detecção de dispositivos e I/O.
-* Suporte para criação e invalidação de handles de dispositivos na plataforma.
-* Encaminhamento de operações de input, output e áudio-haptics.
-* Pontos de entrada exportados compatíveis com C para integrações de linguagens gerenciadas.
-* Configuração de callbacks de log para depuração direta do host[cite: 2].
+Designed to be consumed by the Host via C# P/Invoke, the exported API can also be easily integrated into other languages that support native dynamic libraries and function pointer callbacks.
 
 ---
 
-## Compilação
+## ✨ Features
 
-Requisitos:
-
-* CMake 4.2 ou mais recente[cite: 2].
-* Um compilador compatível com C++20[cite: 2].
-* O submódulo `3rdParty/Gamepad-Core` incluído na configuração do projeto[cite: 2].
-
-Inicialize o submódulo e configure o projeto:
-
-    git submodule update --init
-    cmake -S . -B build -DGCL_DEBUG=OFF
-    cmake --build build
-
-A variável `GCL_DEBUG` pode ser ativada para habilitar o log do host do Gamepad-Core[cite: 2]. A compilação produzirá a biblioteca compartilhada `GamepadCoreHost`[cite: 2].
+* **Device Registry Integration:** Support for host applications or external game engines.
+* **Platform Bridge Callbacks:** Efficient device detection and I/O operations.
+* **Handle Management:** Support for creating and invalidating device handles natively within the platform.
+* **Advanced Forwarding:** Seamless forwarding of input, output, and audio-haptics operations.
+* **C-Compatible Entry Points:** Exported endpoints optimized for managed language integrations.
+* **Direct Debugging:** Configurable log callbacks for real-time host debugging.
 
 ---
 
-## API Nativa
+## 🛠️ Building
 
-A aplicação host deve seguir os seguintes passos de ciclo de vida e atualização:
+**Requirements:**
+* CMake 4.2 or newer.
+* A C++20 compatible compiler.
+* The `3rdParty/Gamepad-Core` submodule included in the project setup.
 
-1. Inicializar os callbacks de ponte de plataforma chamando `GCH_InitializePlatformBridge`[cite: 9].
-2. Registrar os callbacks de alocação, despacho e desconexão via `GCH_InitializeDeviceRegistryPolicy`[cite: 9].
-3. Descobrir novos dispositivos chamando `GCH_DiscoverDevices` a partir do loop de atualização[cite: 5].
-4. Atualizar o estado de cada controle com `GCH_UpdateInput`[cite: 5].
-5. Recuperar os estados de input e informações do hardware do dispositivo através de `GCH_GetInputState` e `GCH_GetDeviceDescriptor`[cite: 5].
+**Initialization & Build:**
+Initialize the submodule and configure the project by running:
 
-### Callbacks e Encerramento
+```bash
+git submodule update --init
+cmake -S . -B build -DGCL_DEBUG=OFF
+cmake --build build
+```
 
-* O log da ponte pode ser redirecionado configurando um callback de função através de `GCH_SetLogCallback`[cite: 2].
-* A versão atual compilada da biblioteca pode ser obtida por `GCH_GetVersion`[cite: 2].
-* Ao finalizar a execução, a aplicação host deve chamar a função `GCH_Shutdown` para destruir a instância da plataforma e zerar os ponteiros de callback com segurança[cite: 2].
-
----
-
-## Estrutura do Projeto
-
-* `Source/Public` — políticas e adaptadores públicos da ponte.
-* `Source/Private` — implementações da ponte.
-* `3rdParty/Gamepad-Core` — submódulo da dependência.
+> **Note:** Set `GCL_DEBUG=ON` to enable Gamepad-Core host logging. The build process will generate the `GamepadCoreHost` shared library.
 
 ---
 
-## Licença
+## ⚙️ Native API Lifecycle
 
-Este projeto utiliza a biblioteca Gamepad-Core (Dualsense-Multiplatform).
+The host application should implement the following lifecycle and update loop steps:
 
-Copyright (c) 2026 valoto.games. Todos os direitos reservados[cite: 2].
+1. **Initialize the Bridge:** Set up platform bridge callbacks by calling `GCH_InitializePlatformBridge`.
+2. **Register Policies:** Define allocation, dispatch, and disconnection callbacks via `GCH_InitializeDeviceRegistryPolicy`.
+3. **Discover Devices:** Continuously poll for new hardware by calling `GCH_DiscoverDevices` from within the update loop.
+4. **Update Controllers:** Refresh the state of each connected controller using `GCH_UpdateInput`.
+5. **Retrieve Data:** Access input states and hardware information via `GCH_GetInputState` and `GCH_GetDeviceDescriptor`.
+
+### Callbacks & Shutdown
+* **Logging:** Bridge logs can be redirected by configuring a function callback via `GCH_SetLogCallback`.
+* **Version Checking:** Retrieve the compiled library version with `GCH_GetVersion`.
+* **Safe Shutdown:** Upon termination, the host application **must** call `GCH_Shutdown` to safely destroy the platform instance and clear callback pointers.
+
+---
+
+## 🚀 Client Implementation
+
+Check out the companion command-line application that consumes this API:
+* [**Gamepad-Client (rafaelvaloto/G-Client-Sharp)**](https://github.com/rafaelvaloto/G-Client-Sharp) - A C# console application for consuming the native Gamepad Core Host API through callbacks and Windows HID interoperability.
+
+---
+
+## 📂 Project Structure
+
+* `Source/Public` — Public bridge policies and adapters.
+* `Source/Private` — Internal bridge implementations.
+* `3rdParty/Gamepad-Core` — The core dependency submodule.
+
+---
+
+## 📄 License
+
+This project utilizes the Gamepad-Core (Dualsense-Multiplatform) library.
+
+Copyright (c) 2026 valoto.games. All rights reserved.
