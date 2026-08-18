@@ -37,30 +37,22 @@ namespace GCH {
         if (!Context || !Context->IsConnected)
             return;
 
+        unsigned char* buffer = Context->GetRawOutputBuffer();
         const auto Handle = reinterpret_cast<std::uintptr_t>(Context->Handle);
 
-        unsigned char* buffer = Context->GetRawOutputBuffer();
-
-
-        std::int32_t OutputReportLength = 32;
+        std::int32_t OutputReportLength = 74;
         if (Context->DeviceType == EDSDeviceType::DualShock4)
         {
             OutputReportLength = Context->ConnectionType == EDSDeviceConnection::Bluetooth ? 78 : 32;
         }
         else
         {
-            // DualSense
+            // PS5 devices
             OutputReportLength = Context->ConnectionType == EDSDeviceConnection::Bluetooth ? 78 : 74;
         }
 
-        char Message[128];
-        std::snprintf(Message,sizeof(Message),"OutputReportLength: %d", OutputReportLength);
-        GCL::Log(0, Message);
-
         std::int32_t BytesWritten = 0;
-        const std::int32_t Result = g_PlatformWriteCallback(Handle, buffer, OutputReportLength, &BytesWritten);
-
-        if (Result)
+        if (const std::int32_t Result = g_PlatformWriteCallback(Handle, buffer, OutputReportLength, &BytesWritten))
         {
             char Message[128];
             std::snprintf(Message,sizeof(Message),"Write file status: %d", Result);
@@ -75,10 +67,9 @@ namespace GCH {
         GamepadDeviceDescriptor Descriptors[MaxDetectedDevices]{};
         const auto Count = g_PlatformDetectCallback(Descriptors, MaxDetectedDevices);
 
-        if (GCL_DEBUG && GCL::LogCallback) {
+        if constexpr (GCL_DEBUG) {
             char Message[128];
             std::snprintf(Message,sizeof(Message), "Detected %d devices", Count);
-
             GCL::Log(0, Message);
         }
 
@@ -86,14 +77,17 @@ namespace GCH {
         for (int i = 0; i < Count && i < MaxDetectedDevices; ++i) {
             GamepadDeviceDescriptor &Descriptor = Descriptors[i];
             FDeviceContext Context = MakeDeviceContext(Descriptor);
-            char Message[128];
-            std::snprintf(Message,sizeof(Message),
-            "Detected Connection=%hhd Type=%hhd Path:%s",
-                Context.ConnectionType,
-                Context.DeviceType,
-                Context.Path.c_str()
-            );
-            GCL::Error(0, Message);
+
+            if constexpr (GCL_DEBUG) {
+                char Message[128];
+                std::snprintf(Message,sizeof(Message),
+                "Detected Connection=%hhd Type=%hhd Path:%s",
+                    Context.ConnectionType,
+                    Context.DeviceType,
+                    Context.Path.c_str()
+                );
+                GCL::Log(0, Message);
+            }
 
             Devices.push_back(Context);
         }
@@ -116,31 +110,7 @@ namespace GCH {
             return false;
         }
 
-        if (GCL_DEBUG && GCL::LogCallback) {
-            char Message[128];
-            std::snprintf(Message,sizeof(Message),
-                "After callback: Handle=%llu Connected=%d Path=%s",
-                OutDescriptor.Handle,
-                OutDescriptor.IsConnected,
-                OutDescriptor.Path
-                );
-
-            GCL::Log(0, Message);
-        }
-
         *Context = MakeDeviceContext(OutDescriptor);
-
-        if (GCL_DEBUG && GCL::LogCallback) {
-            char Message[128];
-            std::snprintf(Message,sizeof(Message),
-                "After set context: Handle=%llu Connected=%d Path=%s",
-                (long long)Context->Handle,
-                Context->IsConnected,
-                Context->Path.c_str());
-
-            GCL::Log(0, Message);
-        }
-
         ConfigureFeatures(Context);
         return true;
     }
