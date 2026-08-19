@@ -2,6 +2,16 @@
 
 **Gamepad-Core Host Bridge** is a native C++ library that exposes the functionality of Gamepad-Core through a high-level, C-compatible API. The current project version is **1.0.6**.
 
+[![C](https://img.shields.io/badge/C-A8B9CC?logo=c&logoColor=white)](https://en.wikipedia.org/wiki/C_(programming_language))
+[![C++](https://img.shields.io/badge/C%2B%2B-00599C?logo=cplusplus&logoColor=white)](https://isocpp.org/)
+[![C%23](https://img.shields.io/badge/C%23-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/languages/csharp)
+[![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Rust](https://img.shields.io/badge/Rust-000000?logo=rust&logoColor=white)](https://www.rust-lang.org/)
+[![Go](https://img.shields.io/badge/Go-00ADD8?logo=go&logoColor=white)](https://go.dev/)
+[![Java](https://img.shields.io/badge/Java-ED8B00?logo=openjdk&logoColor=white)](https://www.java.com/)
+
+[Features](#-features) • [API Lifecycle](#-native-api-lifecycle) • [API References](#-api-references) • [Quick Testing](#-quick-testing) • [Client Implementation](#-client-implementation) • [Build](#-building) • [Structure](#-project-structure) • [Contributing](#-contributing) • [License](#-license)
+
 ---
 
 ## ✨ Features
@@ -114,6 +124,40 @@ dotnet run --project .\G-Client-Sharp\G-Client-Sharp.csproj -- `
 
 The DLL must match the process architecture. Use an x64 DLL with the x64 .NET
 process.
+
+---
+
+Check out the companion command-line application that consumes this API:
+
+* [**Gamepad-Client (Python)**](https://github.com/rafaelvaloto/G-Client-Python) - Python Console application example consuming this
+
+
+Use the configured default DLL path:
+
+```powershell
+python main.py
+```
+
+Provide a DLL path explicitly:
+
+```powershell
+python main.py --dll "C:\path\to\GamepadCoreHost.dll"
+```
+
+Continuously discover devices and process inputs:
+
+```powershell
+python main.py --loop
+```
+
+Useful options:
+
+```text
+-d, --dll PATH       Path to GamepadCoreHost.dll
+-l, --loop           Run continuous discovery and input polling
+-i, --interval TIME  Loop interval in seconds
+--info                Display native API structure details
+```
 
 ---
 
