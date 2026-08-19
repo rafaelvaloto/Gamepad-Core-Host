@@ -91,9 +91,9 @@ Check out the companion command-line application that consumes this API:
 
 ```bash
 git clone https://github.com/rafaelvaloto/G-Client-Sharp
-cd G-Client-Sharp
-dotnet build
-dotnet run -- "path/to/GamepadCoreHost.dll"
+
+dotnet build .\G-Client-Sharp\G-Client-Sharp.csproj
+dotnet run --project .\G-Client-Sharp\G-Client-Sharp.csproj -- `"C:\path\to\GamepadCoreHost.dll"
 ```
 
 ---
