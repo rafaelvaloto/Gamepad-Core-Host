@@ -75,11 +75,9 @@ Rust, Go, Java, and more.
 
 ### 📥 Precompiled Binaries (Windows x64)
 
-For quick integration without building from source, download the precompiled **[GamepadCoreHost.dll](https://github.com/rafaelvaloto/Gamepad-Core/releases/download/v1.0.6/GamepadCoreHost.dll)** binary directly
+For quick integration without building from source, **[download the precompiled GamepadCoreHost.dll](https://github.com/rafaelvaloto/Gamepad-Core/releases/download/v1.0.6/GamepadCoreHost.dll)** binary directly
 from the releases page. This shared library is ready to use with any compatible host application or game engine that
 supports C-compatible FFI (Foreign Function Interface).
-
-Click the link to download the latest version. [GamepadCoreHost.dll](https://github.com/rafaelvaloto/Gamepad-Core/releases/download/v1.0.6/GamepadCoreHost.dll)
 
 
 ### 🚀 Client Implementation
