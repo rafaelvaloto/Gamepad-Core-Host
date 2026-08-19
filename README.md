@@ -63,7 +63,9 @@ The `int` parameters used for device type, connection type, LED, and trigger han
 **`GCH_DualSenseSettings`** allows you to configure advanced settings exclusive to the DualSense controller, including
 audio control (microphone, headset, speaker), volumes, vibration modes, and force reduction on adaptive triggers.
 
-```GCH_DualSenseSettings(int ControllerId, std::uint8_t bIsMic, std::uint8_t bIsHeadset, std::uint8_t bIsSpeaker, std::uint8_t MicVolume, std::uint8_t AudioVolume, std::uint8_t RumbleMode, std::uint8_t RumbleReduce, std::uint8_t TriggerReduce)```
+```cpp
+GCH_DualSenseSettings(int ControllerId, std::uint8_t bIsMic, std::uint8_t bIsHeadset, std::uint8_t bIsSpeaker, std::uint8_t MicVolume, std::uint8_t AudioVolume, std::uint8_t RumbleMode, std::uint8_t RumbleReduce, std::uint8_t TriggerReduce)
+```
 
 ---
 
