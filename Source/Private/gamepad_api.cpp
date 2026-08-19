@@ -48,7 +48,21 @@ GCH_API void GCH_UpdateInput(const int DeviceId, const float DeltaTime)
 		return;
 	}
 
-	Gamepad->UpdateInput(DeltaTime);
+    Gamepad->UpdateInput(DeltaTime);
+}
+
+GCH_API void GCH_UpdateOutput(const int ControllerId)
+{
+    auto* Gamepad = FindGamepad(ControllerId);
+    if (!Gamepad)
+    {
+        char Message[128];
+        std::snprintf(Message, sizeof(Message), "Not gamepad library %d", ControllerId);
+        GCL::Error(0, Message);
+        return;
+    }
+
+    Gamepad->UpdateOutput();
 }
 
 GCH_API bool GCH_GetInputState(const int DeviceId, FInputContext* OutInputState)

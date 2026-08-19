@@ -2,8 +2,6 @@
 
 **Gamepad-Core Host Bridge** is a native C++ library that exposes the functionality of Gamepad-Core through a high-level, C-compatible API. The current project version is **1.0.6**.
 
-Designed to be consumed by the Host via C# P/Invoke, the exported API can also be easily integrated into other languages that support native dynamic libraries and function pointer callbacks.
-
 ---
 
 ## ✨ Features
@@ -14,26 +12,6 @@ Designed to be consumed by the Host via C# P/Invoke, the exported API can also b
 * **Advanced Forwarding:** Seamless forwarding of input, output, and audio-haptics operations.
 * **C-Compatible Entry Points:** Exported endpoints optimized for managed language integrations.
 * **Direct Debugging:** Configurable log callbacks for real-time host debugging.
-
----
-
-## 🛠️ Building
-
-**Requirements:**
-* CMake 4.2 or newer.
-* A C++20 compatible compiler.
-* The `3rdParty/Gamepad-Core` submodule included in the project setup.
-
-**Initialization & Build:**
-Initialize the submodule and configure the project by running:
-
-```bash
-git submodule update --init
-cmake -S . -B build -DGCL_DEBUG=OFF
-cmake --build build
-```
-
-> **Note:** Set `GCL_DEBUG=ON` to enable Gamepad-Core host logging. The build process will generate the `GamepadCoreHost` shared library.
 
 ---
 
@@ -58,21 +36,22 @@ The host application should implement the following lifecycle and update loop st
 
 The following functions are exported by the native bridge:
 
-| Function | Return type |
-| --- | --- |
-| `GCH_DiscoverDevices(float DeltaTime)` | `void` |
-| `GCH_UpdateInput(int DeviceId, float DeltaTime)` | `void` |
-| `GCH_GetInputState(int DeviceId, FInputContext* OutInputState)` | `bool` |
-| `GCH_GetDeviceDescriptor(int DeviceId, GamepadDeviceDescriptor* OutDescriptor)` | `bool` |
-| `GCH_DeviceIsConnected(int ControllerId)` | `bool` |
-| `GCH_GetDeviceType(int ControllerId)` | `int` |
-| `GCH_GetConnectionType(int ControllerId)` | `int` |
-| `GCH_BatteryLevelDevice(int ControllerId)` | `float` |
-| `GCH_Lightbar(int ControllerId, std::uint8_t R, std::uint8_t G, std::uint8_t B)` | `void` |
-| `GCH_LightbarFlash(int ControllerId, std::uint8_t R, std::uint8_t G, std::uint8_t B, float BrightnessTime, float ToggleTime)` | `void` |
-| `GCH_PlayerLed(int ControllerId, int Led, std::uint8_t Brightness)` | `void` |
-| `GCH_ResetLights(int ControllerId)` | `void` |
-| `GCH_DualSenseSettings(int ControllerId, std::uint8_t bIsMic, std::uint8_t bIsHeadset, std::uint8_t bIsSpeaker, std::uint8_t MicVolume, std::uint8_t AudioVolume, std::uint8_t RumbleMode, std::uint8_t RumbleReduce, std::uint8_t TriggerReduce)` | `void` |
+| Function                                                                                                                                                                                                                                           | Return type |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
+| `GCH_DiscoverDevices(float DeltaTime)`                                                                                                                                                                                                             | `void`      |
+| `GCH_UpdateInput(int DeviceId, float DeltaTime)`                                                                                                                                                                                                   | `void`      |
+| `GCH_UpdateOutput(int ControllerId)`                                                                                                                                                                                                               | `void`      |
+| `GCH_GetInputState(int DeviceId, FInputContext* OutInputState)`                                                                                                                                                                                    | `bool`      |
+| `GCH_GetDeviceDescriptor(int DeviceId, GamepadDeviceDescriptor* OutDescriptor)`                                                                                                                                                                    | `bool`      |
+| `GCH_DeviceIsConnected(int ControllerId)`                                                                                                                                                                                                          | `bool`      |
+| `GCH_GetDeviceType(int ControllerId)`                                                                                                                                                                                                              | `int`       |
+| `GCH_GetConnectionType(int ControllerId)`                                                                                                                                                                                                          | `int`       |
+| `GCH_BatteryLevelDevice(int ControllerId)`                                                                                                                                                                                                         | `float`     |
+| `GCH_Lightbar(int ControllerId, std::uint8_t R, std::uint8_t G, std::uint8_t B)`                                                                                                                                                                   | `void`      |
+| `GCH_LightbarFlash(int ControllerId, std::uint8_t R, std::uint8_t G, std::uint8_t B, float BrightnessTime, float ToggleTime)`                                                                                                                      | `void`      |
+| `GCH_PlayerLed(int ControllerId, int Led, std::uint8_t Brightness)`                                                                                                                                                                                | `void`      |
+| `GCH_ResetLights(int ControllerId)`                                                                                                                                                                                                                | `void`      |
+| `GCH_DualSenseSettings(int ControllerId, std::uint8_t bIsMic, std::uint8_t bIsHeadset, std::uint8_t bIsSpeaker, std::uint8_t MicVolume, std::uint8_t AudioVolume, std::uint8_t RumbleMode, std::uint8_t RumbleReduce, std::uint8_t TriggerReduce)` | `void`      |
 | `GCH_ResetGyroOrientation(int ControllerId)` | `void` |
 | `GCH_EnableGyroscopeValues(int ControllerId, bool EnableGyroscope)` | `void` |
 | `GCH_EnableTouch(int ControllerId, bool EnableTouch)` | `void` |
@@ -80,14 +59,66 @@ The following functions are exported by the native bridge:
 | `GCH_StopTrigger(int ControllerId, int Hand)` | `void` |
 | `GCH_SetVibration(int ControllerId, std::uint8_t LeftRumble, std::uint8_t RightRumble)` | `void` |
 
-The `int` parameters used for device type, connection type, LED, and trigger hand correspond to the enum values defined by the native Gamepad-Core library.
+The `int` parameters used for device type, connection type, LED, and trigger hand correspond to the enum values defined by the native [Gamepad-Core/Dualsense-Multiplatform](https://github.com/rafaelvaloto/Dualsense-Multiplatform) library.
+
+**`GCH_DualSenseSettings`** allows you to configure advanced settings exclusive to the DualSense controller, including
+audio control (microphone, headset, speaker), volumes, vibration modes, and force reduction on adaptive triggers.
 
 ---
 
-## 🚀 Client Implementation
+
+## 🧪 Quick Testing
+
+Test quickly with a C# implementation or create an implementation for your preferred language. The C-compatible API is
+designed to integrate seamlessly with any language that supports FFI (Foreign Function Interface), including Python,
+Rust, Go, Java, and more.
+
+### 📥 Precompiled Binaries (Windows x64)
+
+For quick integration without building from source, download the precompiled **[GamepadCoreHost.dll](https://github.com/rafaelvaloto/Gamepad-Core/releases/download/v1.0.6/GamepadCoreHost.dll)** binary directly
+from the releases page. This shared library is ready to use with any compatible host application or game engine that
+supports C-compatible FFI (Foreign Function Interface).
+
+Click the link to download the latest version. [GamepadCoreHost.dll](https://github.com/rafaelvaloto/Gamepad-Core/releases/download/v1.0.6/GamepadCoreHost.dll)
+
+
+### 🚀 Client Implementation
 
 Check out the companion command-line application that consumes this API:
-* [**Gamepad-Client (rafaelvaloto/G-Client-Sharp)**](https://github.com/rafaelvaloto/G-Client-Sharp) - A C# console application for consuming the native Gamepad Core Host API through callbacks and Windows HID interoperability.
+* [**Gamepad-Client (C#)**](https://github.com/rafaelvaloto/G-Client-Sharp) - Console application example consuming this
+
+**Quick Start:**
+
+```bash
+git clone https://github.com/rafaelvaloto/G-Client-Sharp
+cd G-Client-Sharp
+dotnet build
+dotnet run -- "path/to/GamepadCoreHost.dll"
+```
+
+---
+
+## 🛠️ Building
+
+**Initialization & Build:**
+
+If you want to build your custom version, you can start with this example project and consult the available methods
+at [https://github.com/rafaelvaloto/Dualsense-Multiplatform](https://github.com/rafaelvaloto/Dualsense-Multiplatform).
+
+**Requirements:**
+* CMake 4.2 or newer.
+* A C++20 compatible compiler.
+* The `3rdParty/Gamepad-Core` submodule included in the project setup.
+
+Initialize the submodule and configure the project by running:
+
+```bash
+git submodule update --init
+cmake -S . -B build -DGCL_DEBUG=OFF
+cmake --build build
+```
+
+> **Note:** Set `GCL_DEBUG=ON` to enable Gamepad-Core host logging. The build process will generate the `GamepadCoreHost` shared library.
 
 ---
 
@@ -96,6 +127,15 @@ Check out the companion command-line application that consumes this API:
 * `Source/Public` — Public bridge policies and adapters.
 * `Source/Private` — Internal bridge implementations.
 * `3rdParty/Gamepad-Core` — The core dependency submodule.
+
+---
+
+---
+
+## 🤝 Contributing
+
+All suggestions and collaborations are welcome! Feel free to open issues, submit pull requests, or share your ideas to
+help improve this project.
 
 ---
 

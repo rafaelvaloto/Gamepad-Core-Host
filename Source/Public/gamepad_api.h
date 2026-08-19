@@ -35,6 +35,18 @@ GCH_API void GCH_DiscoverDevices(float DeltaTime);
 GCH_API void GCH_UpdateInput(int DeviceId, float DeltaTime);
 
 /**
+ * Updates the output state of a specific gamepad controller.
+ *
+ * This function retrieves the gamepad associated with the provided controller ID
+ * and updates its output state. If the specified gamepad is not found, an error
+ * message is logged.
+ *
+ * @param ControllerId The identifier of the gamepad controller whose output state
+ *                     is to be updated.
+ */
+GCH_API void GCH_UpdateOutput(int ControllerId);
+
+/**
  * Retrieves the current input state of a specific gamepad device.
  *
  * This method provides access to the current state of buttons, analog sticks,
