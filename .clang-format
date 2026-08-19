@@ -1,0 +1,51 @@
+---
+Language:                                       Cpp
+BasedOnStyle:                                   LLVM
+IndentWidth:                                    4
+TabWidth:                                       4
+UseTab:                                         ForIndentation
+Standard:                                       c++20
+FixNamespaceComments:                           true
+NamespaceIndentation:                           All
+AccessModifierOffset:                           -4
+AlignAfterOpenBracket:                          Align
+AlignEscapedNewlines:                           DontAlign
+AlignTrailingComments:                          true
+AllowShortCaseLabelsOnASingleLine:              true
+AllowShortFunctionsOnASingleLine:               InlineOnly
+BreakConstructorInitializersBeforeComma:        true
+RemoveSemicolon: true
+InsertBraces: true
+InsertNewlineAtEOF: true
+
+# We have to set BeforeLambdaBody = false, because in another case it makes incorrect indention
+BreakBeforeBraces:                              Custom
+
+BraceWrapping:
+  AfterEnum:                                    true
+  AfterStruct:                                  true
+  AfterCaseLabel:                               true
+  AfterClass:                                   true
+  AfterControlStatement:                        Always
+  AfterFunction:                                true
+  AfterNamespace:                               true
+  AfterUnion:                                   true
+  AfterExternBlock:                             true
+  BeforeElse:                                   true
+  BeforeCatch:                                  true
+  SplitEmptyFunction:                           false
+  IndentBraces:                                 false
+
+AllowShortLambdasOnASingleLine:                 Inline
+ColumnLimit:                                    0
+PointerAlignment:                               Left
+SpaceAfterTemplateKeyword:                      false
+SpacesInAngles:                                 false
+ContinuationIndentWidth:                        4
+IndentCaseLabels:                               true
+IncludeBlocks:                                  Merge
+IncludeCategories:
+  - Regex:    '*.h'
+    Priority: 2
+  - Regex:    '*.cpp'
+    Priority: 1

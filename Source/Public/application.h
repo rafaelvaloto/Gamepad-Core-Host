@@ -6,14 +6,15 @@
 #include "Types/GCHTypes.h"
 
 #if defined(_WIN32) || defined(_WIN64)
-    #define GCH_API __declspec(dllexport)
+#define GCH_API __declspec(dllexport)
 #elif defined(__unix__) || defined(__GNUC__) || defined(__clang__)
-    #define GCH_API __attribute__((visibility("default")))
+#define GCH_API __attribute__((visibility("default")))
 #else
-    #define GCH_API
+#define GCH_API
 #endif
 
-extern "C" {
+extern "C"
+{
 /**
  * @brief Shuts down the game controller hardware library and releases associated resources.
  *

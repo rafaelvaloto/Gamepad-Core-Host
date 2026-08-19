@@ -37,17 +37,18 @@ constexpr char GCH_VERSION[] = GCH_VERSION_STRING;
  *
  * @struct GamepadDeviceDescriptor
  */
-struct GamepadDeviceDescriptor {
-    /// Unique platform-specific handle identifying the device hardware
-    std::uint64_t Handle;
-    /// Type identifier for the device (corresponds to EDSDeviceType: DualSense, DualSenseEdge, DualShock4, NotFound) 1,2,3,4
-    std::int32_t DeviceType;
-    /// Connection method type (corresponds to EDSDeviceConnection: Usb, Bluetooth, Unrecognized) 1,2,3
-    std::int32_t ConnectionType;
-    /// Connection status flag: non-zero if device is currently connected, zero otherwise
-    std::int32_t IsConnected;
-    /// Platform-specific device path or identifier string (null-terminated, max 512 bytes)
-    char Path[512];
+struct GamepadDeviceDescriptor
+{
+	/// Unique platform-specific handle identifying the device hardware
+	std::uint64_t Handle;
+	/// Type identifier for the device (corresponds to EDSDeviceType: DualSense, DualSenseEdge, DualShock4, NotFound) 1,2,3,4
+	std::int32_t DeviceType;
+	/// Connection method type (corresponds to EDSDeviceConnection: Usb, Bluetooth, Unrecognized) 1,2,3
+	std::int32_t ConnectionType;
+	/// Connection status flag: non-zero if device is currently connected, zero otherwise
+	std::int32_t IsConnected;
+	/// Platform-specific device path or identifier string (null-terminated, max 512 bytes)
+	char Path[512];
 };
 
 static_assert(offsetof(GamepadDeviceDescriptor, Handle) == 0);
@@ -66,7 +67,7 @@ static_assert(offsetof(GamepadDeviceDescriptor, Path) == 20);
  * @param Level The severity level of the log message (e.g., Info, Warning, Error).
  * @param Message Null-terminated string containing the log message text.
  */
-typedef void (*GamepadLogCallback)(int Level, const char *Message);
+typedef void (*GamepadLogCallback)(int Level, const char* Message);
 
 /**
  * @brief Callback type for allocating a new engine device.
@@ -111,8 +112,8 @@ typedef void (*DisconnectDeviceCallback)(int);
  * @param BytesRead Pointer to an integer that will receive the number of bytes actually read.
  * @return bool Number of bytes actually read.
  */
-typedef bool (*PlatformReadCallback)(std::uint64_t Handle, std::uint8_t *Buffer, std::int32_t Length,
-                                     std::int32_t *BytesRead);
+typedef bool (*PlatformReadCallback)(std::uint64_t Handle, std::uint8_t* Buffer, std::int32_t Length,
+                                     std::int32_t* BytesRead);
 
 /**
  * @brief Callback type for writing output data to platform device.
@@ -127,8 +128,8 @@ typedef bool (*PlatformReadCallback)(std::uint64_t Handle, std::uint8_t *Buffer,
  * @param BytesWritten Pointer to the device context containing output data to write.
  * @return bool Number of bytes actually written.
  */
-typedef bool (*PlatformWriteCallback)(std::uint64_t Handle, std::uint8_t *Buffer, std::int32_t Length,
-                                      std::int32_t *BytesWritten);
+typedef bool (*PlatformWriteCallback)(std::uint64_t Handle, std::uint8_t* Buffer, std::int32_t Length,
+                                      std::int32_t* BytesWritten);
 
 /**
  * @brief Callback type for detecting connected platform devices.
@@ -141,7 +142,7 @@ typedef bool (*PlatformWriteCallback)(std::uint64_t Handle, std::uint8_t *Buffer
  * @param MaxDevices Maximum number of devices that can be stored in the array.
  * @return std::int32_t The number of devices detected and populated in the array.
  */
-typedef std::int32_t (*PlatformDetectCallback)(GamepadDeviceDescriptor *Devices, int MaxDevices);
+typedef std::int32_t (*PlatformDetectCallback)(GamepadDeviceDescriptor* Devices, int MaxDevices);
 
 /**
  * @brief Callback type for configuring platform device features.
@@ -154,8 +155,8 @@ typedef std::int32_t (*PlatformDetectCallback)(GamepadDeviceDescriptor *Devices,
  * @param Length Number of bytes in the configuration buffer.
  * @param Bytes Pointer to an integer that will receive the number of bytes processed.
  */
-typedef void (*PlatformConfigureFeaturesCallback)(std::uint64_t Handle, const std::uint8_t *Buffer, std::int32_t Length,
-                                                  std::int32_t *Bytes);
+typedef void (*PlatformConfigureFeaturesCallback)(std::uint64_t Handle, const std::uint8_t* Buffer, std::int32_t Length,
+                                                  std::int32_t* Bytes);
 
 /**
  * @brief Callback type for creating platform device handle.
@@ -166,7 +167,7 @@ typedef void (*PlatformConfigureFeaturesCallback)(std::uint64_t Handle, const st
  *
  * @return True if the handle was successfully created, false otherwise.
  */
-typedef bool (*PlatformCreateHandleCallback)(GamepadDeviceDescriptor *Device);
+typedef bool (*PlatformCreateHandleCallback)(GamepadDeviceDescriptor* Device);
 
 /**
  * @brief Callback type for invalidating platform device handle.
@@ -190,9 +191,9 @@ typedef void (*PlatformInvalidateHandleCallback)(std::uint64_t Handle);
  * @param Length The length of the audio data buffer in bytes.
  * @param BytesWritten Pointer to an integer that will receive the number of bytes written to the device.
  */
-typedef void (*PlatformProcessAudioHapticsCallback)(std::uint64_t Handle, const std::uint8_t *Buffer,
+typedef void (*PlatformProcessAudioHapticsCallback)(std::uint64_t Handle, const std::uint8_t* Buffer,
                                                     std::int32_t Length,
-                                                    std::int32_t *BytesWritten);
+                                                    std::int32_t* BytesWritten);
 
 /**
  * @brief Global variable storing the Host engine type identifier.
@@ -291,32 +292,37 @@ extern PlatformProcessAudioHapticsCallback g_PlatformProcessAudioHapticsCallback
  * It provides a centralized mechanism for the library to communicate log messages to the host
  * application through the configured log callback.
  */
-namespace GCL {
-    /**
-     * @brief Global callback pointer for logging messages from the library.
-     *
-     * This callback is invoked by the library to send log messages to the host application.
-     * It should be set during initialization to enable proper logging integration with the
-     * host's logging system. If not set (nullptr), logging will be disabled.
-     */
-    inline GamepadLogCallback LogCallback = nullptr;
+namespace GCL
+{
+	/**
+	 * @brief Global callback pointer for logging messages from the library.
+	 *
+	 * This callback is invoked by the library to send log messages to the host application.
+	 * It should be set during initialization to enable proper logging integration with the
+	 * host's logging system. If not set (nullptr), logging will be disabled.
+	 */
+	inline GamepadLogCallback LogCallback = nullptr;
 
-    inline void Log(const int Level, const char *Message) {
+	inline void Log(const int Level, const char* Message)
+	{
 #if GCL_DEBUG
-        if (LogCallback) {
-            LogCallback(Level, Message);
-        }
+		if (LogCallback)
+		{
+			LogCallback(Level, Message);
+		}
 #else
-        (void)Level;
-        (void)Message;
+		(void)Level;
+		(void)Message;
 #endif
-    }
+	}
 
-    inline void Error(const int Level, const char *Message) {
-        if (LogCallback) {
-            LogCallback(Level, Message);
-        }
-    }
+	inline void Error(const int Level, const char* Message)
+	{
+		if (LogCallback)
+		{
+			LogCallback(Level, Message);
+		}
+	}
 }
 
 /**

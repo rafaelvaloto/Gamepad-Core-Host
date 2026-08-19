@@ -54,6 +54,36 @@ The host application should implement the following lifecycle and update loop st
 
 ---
 
+## 📚 API References
+
+The following functions are exported by the native bridge:
+
+| Function | Return type |
+| --- | --- |
+| `GCH_DiscoverDevices(float DeltaTime)` | `void` |
+| `GCH_UpdateInput(int DeviceId, float DeltaTime)` | `void` |
+| `GCH_GetInputState(int DeviceId, FInputContext* OutInputState)` | `bool` |
+| `GCH_GetDeviceDescriptor(int DeviceId, GamepadDeviceDescriptor* OutDescriptor)` | `bool` |
+| `GCH_DeviceIsConnected(int ControllerId)` | `bool` |
+| `GCH_GetDeviceType(int ControllerId)` | `int` |
+| `GCH_GetConnectionType(int ControllerId)` | `int` |
+| `GCH_BatteryLevelDevice(int ControllerId)` | `float` |
+| `GCH_Lightbar(int ControllerId, std::uint8_t R, std::uint8_t G, std::uint8_t B)` | `void` |
+| `GCH_LightbarFlash(int ControllerId, std::uint8_t R, std::uint8_t G, std::uint8_t B, float BrightnessTime, float ToggleTime)` | `void` |
+| `GCH_PlayerLed(int ControllerId, int Led, std::uint8_t Brightness)` | `void` |
+| `GCH_ResetLights(int ControllerId)` | `void` |
+| `GCH_DualSenseSettings(int ControllerId, std::uint8_t bIsMic, std::uint8_t bIsHeadset, std::uint8_t bIsSpeaker, std::uint8_t MicVolume, std::uint8_t AudioVolume, std::uint8_t RumbleMode, std::uint8_t RumbleReduce, std::uint8_t TriggerReduce)` | `void` |
+| `GCH_ResetGyroOrientation(int ControllerId)` | `void` |
+| `GCH_EnableGyroscopeValues(int ControllerId, bool EnableGyroscope)` | `void` |
+| `GCH_EnableTouch(int ControllerId, bool EnableTouch)` | `void` |
+| `GCH_CustomTrigger(int ControllerId, const std::uint8_t* HexBytes, int ByteCount, int Hand)` | `bool` |
+| `GCH_StopTrigger(int ControllerId, int Hand)` | `void` |
+| `GCH_SetVibration(int ControllerId, std::uint8_t LeftRumble, std::uint8_t RightRumble)` | `void` |
+
+The `int` parameters used for device type, connection type, LED, and trigger hand correspond to the enum values defined by the native Gamepad-Core library.
+
+---
+
 ## 🚀 Client Implementation
 
 Check out the companion command-line application that consumes this API:

@@ -5,15 +5,23 @@
 
 #include "GCore/Types/Structs/Context/DeviceContext.h"
 
-namespace GCH {
-    class PlatformBridgePolicy {
-    public:
-        static void Read(FDeviceContext* Context);
-        static void Write(FDeviceContext* Context);
-        static void Detect(std::vector<FDeviceContext>& Devices);
-        static bool CreateHandle(FDeviceContext* Context);
-        static void InvalidateHandle(FDeviceContext* Context);
-        static void ConfigureFeatures(FDeviceContext *Context);
-        static void ProcessAudioHaptic(FDeviceContext* Context);
-    };
+namespace GCH
+{
+	class PlatformBridgePolicy
+	{
+	public:
+		static void Read(FDeviceContext* Context);
+
+		static void Write(FDeviceContext* Context);
+
+		static void Detect(std::vector<FDeviceContext>& Devices);
+
+		static bool CreateHandle(FDeviceContext* Context);
+
+		static void InvalidateHandle(FDeviceContext* Context);
+
+		static void ConfigureFeatures(FDeviceContext* Context);
+
+		static void ProcessAudioHaptic(FDeviceContext* Context);
+	};
 } // namespace GCH

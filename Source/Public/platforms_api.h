@@ -4,7 +4,8 @@
 #pragma once
 #include "application.h"
 
-extern "C" {
+extern "C"
+{
 /**
  * Initializes the device registry policy by setting the engine type ID and callback functions
  * for device allocation, gamepad dispatch, and device disconnection.
@@ -15,10 +16,10 @@ extern "C" {
  * @param DisconnectCallback A callback function for handling device disconnection events.
  */
 GCH_API void GCH_InitializeDeviceRegistryPolicy(
-    int TypeId,
-    AllocEngineDeviceCallback AllocCallback,
-    DispatchNewGamepadCallback DispatchCallback,
-    DisconnectDeviceCallback DisconnectCallback);
+	int TypeId,
+	AllocEngineDeviceCallback AllocCallback,
+	DispatchNewGamepadCallback DispatchCallback,
+	DisconnectDeviceCallback DisconnectCallback);
 
 
 /**
@@ -34,12 +35,12 @@ GCH_API void GCH_InitializeDeviceRegistryPolicy(
  * @param ProcessAudioHapticsCallback A callback function for processing audio-based haptics data.
  */
 GCH_API void GCH_InitializePlatformBridge(
-    PlatformReadCallback ReadCallback,
-    PlatformWriteCallback WriteCallback,
-    PlatformDetectCallback DetectCallback,
-    PlatformCreateHandleCallback CreateHandleCallback,
-    PlatformInvalidateHandleCallback InvalidateHandleCallback,
-    PlatformConfigureFeaturesCallback ConfigureFeaturesCallback,
-    PlatformProcessAudioHapticsCallback ProcessAudioHapticsCallback);
+	PlatformReadCallback ReadCallback,
+	PlatformWriteCallback WriteCallback,
+	PlatformDetectCallback DetectCallback,
+	PlatformCreateHandleCallback CreateHandleCallback,
+	PlatformInvalidateHandleCallback InvalidateHandleCallback,
+	PlatformConfigureFeaturesCallback ConfigureFeaturesCallback,
+	PlatformProcessAudioHapticsCallback ProcessAudioHapticsCallback);
 
 }

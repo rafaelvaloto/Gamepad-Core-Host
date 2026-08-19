@@ -4,23 +4,27 @@
 
 #include "Adapters/DeviceRegistry.h"
 
-namespace GCH {
-    std::unique_ptr<FDeviceRegistry> FDeviceRegistry::Instance = nullptr;
+namespace GCH
+{
+	std::unique_ptr<FDeviceRegistry> FDeviceRegistry::Instance = nullptr;
 
-    FDeviceRegistry::FDeviceRegistry() = default;
+	FDeviceRegistry::FDeviceRegistry() = default;
 
-    FDeviceRegistry::~FDeviceRegistry() = default;
+	FDeviceRegistry::~FDeviceRegistry() = default;
 
-    FDeviceRegistry* FDeviceRegistry::Get() {
-        if (!Instance) {
-            // this code is inside a member function of FDeviceRegistry.
-            Instance.reset(new FDeviceRegistry());
-        }
+	FDeviceRegistry* FDeviceRegistry::Get()
+	{
+		if (!Instance)
+		{
+			// this code is inside a member function of FDeviceRegistry.
+			Instance.reset(new FDeviceRegistry());
+		}
 
-        return Instance.get();
-    }
+		return Instance.get();
+	}
 
-    void FDeviceRegistry::Shutdown() {
-        Instance.reset();
-    }
+	void FDeviceRegistry::Shutdown()
+	{
+		Instance.reset();
+	}
 } // GCH

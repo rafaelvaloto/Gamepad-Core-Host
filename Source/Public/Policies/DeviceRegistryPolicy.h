@@ -4,17 +4,21 @@
 #pragma once
 #include <functional>
 
-namespace GCH {
-    struct DeviceRegistryPolicy {
-        using EngineIdType = int;
+namespace GCH
+{
+	struct DeviceRegistryPolicy
+	{
+		using EngineIdType = int;
 
-        static EngineIdType AllocEngineDevice();
-        static void DisconnectDevice(EngineIdType id);
-        static void DispatchNewGamepad(EngineIdType id);
+		static EngineIdType AllocEngineDevice();
 
-        struct Hasher
-        {
-            size_t operator()(const EngineIdType& id) const { return std::hash<EngineIdType>{}(id); }
-        };
-    };
+		static void DisconnectDevice(EngineIdType id);
+
+		static void DispatchNewGamepad(EngineIdType id);
+
+		struct Hasher
+		{
+			size_t operator()(const EngineIdType& id) const { return std::hash<EngineIdType>{}(id); }
+		};
+	};
 } // GCH
