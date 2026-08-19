@@ -130,8 +130,6 @@ cmake --build build
 
 ---
 
----
-
 ## 🤝 Contributing
 
 All suggestions and collaborations are welcome! Feel free to open issues, submit pull requests, or share your ideas to
