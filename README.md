@@ -177,6 +177,10 @@ supports callback-table pointers through:
 * `GCH_InitializePlatformBridgeWasm`
 * `GCH_InitializeDeviceRegistryPolicyWasm`
 
+Download the precompiled WebAssembly package:
+
+* [**wasm_gamepad_core_host.zip**](https://github.com/rafaelvaloto/Gamepad-Core-Host/releases/download/v1.0.6/wasm_gamepad_core_host.zip)
+
 TypeScript integrations can use the generated JavaScript module together with
 custom type declarations for the exported native functions and callback
 signatures.
