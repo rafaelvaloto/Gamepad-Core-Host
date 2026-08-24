@@ -35,12 +35,19 @@ namespace GCH
 
 		if (Result != 1)
 		{
+			char Message[128];
+			std::snprintf(Message, sizeof(Message), "Bytes Read %d file status: %d", BytesRead, Result);
+			GCL::Error(0, Message);
 			InvalidateHandle(Context);
 		}
 	}
 
 	void PlatformBridgePolicy::Write(FDeviceContext* Context)
 	{
+		char Message[128];
+		std::snprintf(Message, sizeof(Message), "Write init device status: %d", Context->IsConnected);
+		GCL::Error(0, Message);
+
 		if (!Context || !Context->IsConnected)
 			return;
 
@@ -62,7 +69,7 @@ namespace GCH
 		if (const std::int32_t Result = g_PlatformWriteCallback(Handle, buffer, OutputReportLength, &BytesWritten))
 		{
 			char Message[128];
-			std::snprintf(Message, sizeof(Message), "Write file status: %d", Result);
+			std::snprintf(Message, sizeof(Message), "Bytes Written %d file status: %d", BytesWritten, Result);
 			GCL::Log(0, Message);
 		}
 	}
@@ -162,6 +169,7 @@ namespace GCH
 			}
 
 			Context->Calibration = Calibration;
+			GCL::Error(0, "Configure Features DualShock, Calibration");
 		}
 		else
 		{
@@ -174,12 +182,13 @@ namespace GCH
 			DualSenseCalibrationSensors(FeatureBuffer, Calibration, Context);
 			Context->Calibration = Calibration;
 
-			GCL::Log(0, "Configure Features 41, Calibration");
+			GCL::Error(0, "Configure Features DualSense 41, Calibration");
 		}
 	}
 
 	void PlatformBridgePolicy::InvalidateHandle(FDeviceContext* Context)
 	{
+		GCL::Error(0, "Invalidate Handle");
 		if (!Context)
 			return;
 

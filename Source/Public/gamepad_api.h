@@ -22,6 +22,18 @@ extern "C"
 GCH_API void GCH_DiscoverDevices(float DeltaTime);
 
 /**
+ * Creates a gamepad device from an externally provided descriptor, registering it
+ * under the specified DeviceId instead of allocating a new one via the engine callback.
+ *
+ * This is the primary entry point for WebAssembly / WASM hosts where the device ID
+ * is managed on the JS side. The Descriptor is converted to an FDeviceContext and
+ * passed directly to the registry's CreateDevice path.
+ *
+ * @param Descriptor Pointer to the hardware descriptor for the device. Must not be nullptr.
+ */
+GCH_API void GCH_CreateDevice(const GamepadDeviceDescriptor* Descriptor);
+
+/**
  * Updates the input state for a specific gamepad device.
  *
  * This method processes input events and updates the internal state of the specified

@@ -43,4 +43,29 @@ GCH_API void GCH_InitializePlatformBridge(
 	PlatformConfigureFeaturesCallback ConfigureFeaturesCallback,
 	PlatformProcessAudioHapticsCallback ProcessAudioHapticsCallback);
 
+#if defined(__EMSCRIPTEN__)
+/**
+ * Initializes the platform bridge from raw WebAssembly table pointers
+ * (such as values returned by JavaScript addFunction()).
+ */
+GCH_API void GCH_InitializePlatformBridgeWasm(
+	std::uintptr_t ReadCallbackPtr,
+	std::uintptr_t WriteCallbackPtr,
+	std::uintptr_t DetectCallbackPtr,
+	std::uintptr_t CreateHandleCallbackPtr,
+	std::uintptr_t InvalidateHandleCallbackPtr,
+	std::uintptr_t ConfigureFeaturesCallbackPtr,
+	std::uintptr_t ProcessAudioHapticsCallbackPtr);
+
+/**
+ * Initializes the device registry policy from raw WebAssembly table pointers
+ * (such as values returned by JavaScript addFunction()).
+ */
+GCH_API void GCH_InitializeDeviceRegistryPolicyWasm(
+	int TypeId,
+	std::uintptr_t AllocCallbackPtr,
+	std::uintptr_t DispatchCallbackPtr,
+	std::uintptr_t DisconnectCallbackPtr);
+#endif
+
 }

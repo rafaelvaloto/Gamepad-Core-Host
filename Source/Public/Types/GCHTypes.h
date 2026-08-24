@@ -405,4 +405,11 @@ inline DispatchNewGamepadCallback g_DispatchDeviceCallback = nullptr;
  */
 inline DisconnectDeviceCallback g_DisconnectDeviceCallback = nullptr;
 
+/**
+ * @brief When set to a value >= 0, DeviceRegistryPolicy::AllocEngineDevice() will
+ * return this ID instead of invoking g_AllocDeviceCallback. Consumed on first use.
+ * Used by GCH_CreateDevice to force a specific DeviceId.
+ */
+inline int g_PendingDeviceId = -1;
+
 #endif //GAMEPADCORE_GAMEPAD_TYPES_API_H

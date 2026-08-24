@@ -9,8 +9,11 @@
 [![Rust](https://img.shields.io/badge/Rust-000000?logo=rust&logoColor=white)](https://www.rust-lang.org/)
 [![Go](https://img.shields.io/badge/Go-00ADD8?logo=go&logoColor=white)](https://go.dev/)
 [![Java](https://img.shields.io/badge/Java-ED8B00?logo=openjdk&logoColor=white)](https://www.java.com/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![WebAssembly](https://img.shields.io/badge/WebAssembly-654FF0?logo=webassembly&logoColor=white)](https://webassembly.org/)
 
-[Features](#-features) • [API Lifecycle](#-native-api-lifecycle) • [API References](#-api-references) • [Quick Testing](#-quick-testing) • [Client Implementation](#-client-implementation) • [Build](#-building) • [Structure](#-project-structure) • [Contributing](#-contributing) • [License](#-license)
+[Features](#-features) • [API Lifecycle](#-native-api-lifecycle) • [API References](#-api-references) • [Quick Testing](#-quick-testing) • [JavaScript, TypeScript & WebAssembly](#-javascript-typescript--webassembly) • [Build](#-building) • [Structure](#-project-structure) • [Contributing](#-contributing) • [License](#-license)
 
 ---
 
@@ -160,6 +163,26 @@ Useful options:
 
 ---
 
+## 🌐 JavaScript, TypeScript & WebAssembly
+
+The C-compatible API can also be consumed from JavaScript and TypeScript through
+**WebAssembly**, compiled with [Emscripten](https://emscripten.org/). This makes
+Gamepad-Core Host available to browser applications, Node.js tools, and other
+JavaScript runtimes that support WebAssembly.
+
+The WebAssembly build generates `GamepadCoreHost.js` and `GamepadCoreHost.wasm`.
+For JavaScript callback binding, it exports `addFunction`/`removeFunction` and
+supports callback-table pointers through:
+
+* `GCH_InitializePlatformBridgeWasm`
+* `GCH_InitializeDeviceRegistryPolicyWasm`
+
+TypeScript integrations can use the generated JavaScript module together with
+custom type declarations for the exported native functions and callback
+signatures.
+
+---
+
 ## 🛠️ Building
 
 **Initialization & Build:**
@@ -168,7 +191,7 @@ If you want to build your custom version, you can start with this example projec
 at [https://github.com/rafaelvaloto/Dualsense-Multiplatform](https://github.com/rafaelvaloto/Dualsense-Multiplatform).
 
 **Requirements:**
-* CMake 4.2 or newer.
+* CMake 3.20 or newer.
 * A C++20 compatible compiler.
 * The `3rdParty/Gamepad-Core` submodule included in the project setup.
 
@@ -181,6 +204,14 @@ cmake --build build
 ```
 
 > **Note:** Set `GCL_DEBUG=ON` to enable Gamepad-Core host logging. The build process will generate the `GamepadCoreHost` shared library.
+
+To build the WebAssembly module for JavaScript and TypeScript, configure CMake
+with the Emscripten toolchain:
+
+```bash
+cmake -S . -B build-wasm -DGCL_DEBUG=OFF -DCMAKE_TOOLCHAIN_FILE=%EMSDK%/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+cmake --build build-wasm
+```
 
 ---
 

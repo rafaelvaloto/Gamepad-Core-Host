@@ -30,6 +30,26 @@ GCH_API void GCH_DiscoverDevices(const float DeltaTime)
 		Registry->PlugAndPlay(DeltaTime);
 }
 
+
+GCH_API void GCH_CreateDevice(const GamepadDeviceDescriptor* Descriptor)
+{
+	if (!Descriptor)
+	{
+		GCL::Error(0, "[Error]: GCH_CreateDevice called with null Descriptor");
+		return;
+	}
+
+	auto* Registry = GCH::FDeviceRegistry::Get();
+	if (!Registry)
+	{
+		GCL::Error(0, "[Error]: GCH_CreateDevice called before GCH_InitializePlatformBridge");
+		return;
+	}
+
+	FDeviceContext Context = GCH::MakeDeviceContext(*Descriptor);
+	Registry->CreateDevice(Context);
+}
+
 GCH_API void GCH_UpdateInput(const int DeviceId, const float DeltaTime)
 {
 	auto* Registry = GCH::FDeviceRegistry::Get();
@@ -69,13 +89,27 @@ GCH_API bool GCH_GetInputState(const int DeviceId, FInputContext* OutInputState)
 {
 	if (!OutInputState)
 	{
-		GCL::Error(0, "[Error]: OutInputState is null");
+		if constexpr (GCL_DEBUG)
+		{
+			char Message[128];
+			std::snprintf(Message, sizeof(Message), "GCH_GetInputState is null: %d", DeviceId);
+			GCL::Log(1, Message);
+		}
 		return false;
 	}
 
 	auto* Gamepad = FindGamepad(DeviceId);
 	if (!Gamepad)
+	{
+		if constexpr (GCL_DEBUG)
+		{
+			char Message[128];
+			std::snprintf(Message, sizeof(Message), "FindGamepad is null: %d", DeviceId);
+			GCL::Log(1, Message);
+		}
 		return false;
+	}
+
 
 	auto* DeviceContext = Gamepad->GetMutableDeviceContext();
 	if (!DeviceContext)

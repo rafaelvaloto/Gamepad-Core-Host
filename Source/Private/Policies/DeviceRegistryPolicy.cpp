@@ -9,23 +9,45 @@ namespace GCH
 {
 	DeviceRegistryPolicy::EngineIdType DeviceRegistryPolicy::AllocEngineDevice()
 	{
-		if (GCL_DEBUG && GCL::LogCallback)
-			GCL::Log(1, "AllocEngineDevice");
+		if constexpr (GCL_DEBUG)
+		{
+			char Message[128];
+			std::snprintf(Message, sizeof(Message), "AllocEngineDevice");
+			GCL::Log(1, Message);
+		}
+
+		if (g_PendingDeviceId >= 0)
+		{
+			const EngineIdType Id = g_PendingDeviceId;
+			g_PendingDeviceId = -1;
+			return Id;
+		}
+
 		return g_AllocDeviceCallback ? g_AllocDeviceCallback() : -1;
 	}
 
 	void DeviceRegistryPolicy::DisconnectDevice(EngineIdType id)
 	{
-		if (GCL_DEBUG && GCL::LogCallback)
-			GCL::Log(1, "DisconnectDevice");
+		if constexpr (GCL_DEBUG)
+		{
+			char Message[128];
+			std::snprintf(Message, sizeof(Message), "DisconnectDevice: %d", id);
+			GCL::Log(1, Message);
+		}
+
 		if (g_DisconnectDeviceCallback)
 			g_DisconnectDeviceCallback(id);
 	}
 
 	void DeviceRegistryPolicy::DispatchNewGamepad(EngineIdType id)
 	{
-		if (GCL_DEBUG && GCL::LogCallback)
-			GCL::Log(1, "DispatchNewGamepad");
+		if constexpr (GCL_DEBUG)
+		{
+			char Message[128];
+			std::snprintf(Message, sizeof(Message), "DispatchNewGamepad: %d", id);
+			GCL::Log(1, Message);
+		}
+
 		if (g_DispatchDeviceCallback)
 			g_DispatchDeviceCallback(id);
 	}

@@ -41,3 +41,46 @@ GCH_API void GCH_InitializeDeviceRegistryPolicy(
 	g_DispatchDeviceCallback = DispatchCallback;
 	g_DisconnectDeviceCallback = DisconnectCallback;
 }
+
+#if defined(__EMSCRIPTEN__)
+namespace
+{
+	template <typename TCallback>
+	TCallback FromWasmTablePointer(const std::uintptr_t Pointer)
+	{
+		return reinterpret_cast<TCallback>(Pointer);
+	}
+}
+
+GCH_API void GCH_InitializePlatformBridgeWasm(
+	const std::uintptr_t ReadCallbackPtr,
+	const std::uintptr_t WriteCallbackPtr,
+	const std::uintptr_t DetectCallbackPtr,
+	const std::uintptr_t CreateHandleCallbackPtr,
+	const std::uintptr_t InvalidateHandleCallbackPtr,
+	const std::uintptr_t ConfigureFeaturesCallbackPtr,
+	const std::uintptr_t ProcessAudioHapticsCallbackPtr)
+{
+	GCH_InitializePlatformBridge(
+		FromWasmTablePointer<PlatformReadCallback>(ReadCallbackPtr),
+		FromWasmTablePointer<PlatformWriteCallback>(WriteCallbackPtr),
+		FromWasmTablePointer<PlatformDetectCallback>(DetectCallbackPtr),
+		FromWasmTablePointer<PlatformCreateHandleCallback>(CreateHandleCallbackPtr),
+		FromWasmTablePointer<PlatformInvalidateHandleCallback>(InvalidateHandleCallbackPtr),
+		FromWasmTablePointer<PlatformConfigureFeaturesCallback>(ConfigureFeaturesCallbackPtr),
+		FromWasmTablePointer<PlatformProcessAudioHapticsCallback>(ProcessAudioHapticsCallbackPtr));
+}
+
+GCH_API void GCH_InitializeDeviceRegistryPolicyWasm(
+	const int TypeId,
+	const std::uintptr_t AllocCallbackPtr,
+	const std::uintptr_t DispatchCallbackPtr,
+	const std::uintptr_t DisconnectCallbackPtr)
+{
+	GCH_InitializeDeviceRegistryPolicy(
+		TypeId,
+		FromWasmTablePointer<AllocEngineDeviceCallback>(AllocCallbackPtr),
+		FromWasmTablePointer<DispatchNewGamepadCallback>(DispatchCallbackPtr),
+		FromWasmTablePointer<DisconnectDeviceCallback>(DisconnectCallbackPtr));
+}
+#endif
