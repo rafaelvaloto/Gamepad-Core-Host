@@ -13,9 +13,10 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![WebAssembly](https://img.shields.io/badge/WebAssembly-654FF0?logo=webassembly&logoColor=white)](https://webassembly.org/)
 
-[Features](#-features) • [API Lifecycle](#-native-api-lifecycle) • [API References](#-api-references) • [Quick Testing](#-quick-testing) • [JavaScript, TypeScript & WebAssembly](#-javascript-typescript--webassembly) • [Build](#-building) • [Structure](#-project-structure) • [Contributing](#-contributing) • [License](#-license)
+[Live Tests](#-live-tests) • [Features](#-features) • [API Lifecycle](#-native-api-lifecycle) • [API References](#-api-references) • [Quick Testing](#-quick-testing) • [JavaScript, TypeScript & WebAssembly](#-javascript-typescript--webassembly) • [Build](#-building) • [Structure](#-project-structure) • [Contributing](#-contributing) • [License](#-license)
 
 ---
+
 
 ## ✨ Features
 
@@ -45,43 +46,15 @@ The host application should implement the following lifecycle and update loop st
 
 ---
 
-## 📚 API References
+## 🧪 Live Tests
 
-The following functions are exported by the native bridge:
+Try the WebAssembly build directly in your browser:
 
-| Function                                                                                                                                                                                                                                           | Return type |
-|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
-| `GCH_DiscoverDevices(float DeltaTime)`                                                                                                                                                                                                             | `void`      |
-| `GCH_UpdateInput(int DeviceId, float DeltaTime)`                                                                                                                                                                                                   | `void`      |
-| `GCH_UpdateOutput(int ControllerId)`                                                                                                                                                                                                               | `void`      |
-| `GCH_GetInputState(int DeviceId, FInputContext* OutInputState)`                                                                                                                                                                                    | `bool`      |
-| `GCH_GetDeviceDescriptor(int DeviceId, GamepadDeviceDescriptor* OutDescriptor)`                                                                                                                                                                    | `bool`      |
-| `GCH_DeviceIsConnected(int ControllerId)`                                                                                                                                                                                                          | `bool`      |
-| `GCH_GetDeviceType(int ControllerId)`                                                                                                                                                                                                              | `int`       |
-| `GCH_GetConnectionType(int ControllerId)`                                                                                                                                                                                                          | `int`       |
-| `GCH_BatteryLevelDevice(int ControllerId)`                                                                                                                                                                                                         | `float`     |
-| `GCH_Lightbar(int ControllerId, std::uint8_t R, std::uint8_t G, std::uint8_t B)`                                                                                                                                                                   | `void`      |
-| `GCH_PlayerLed(int ControllerId, int Led, std::uint8_t Brightness)`                                                                                                                                                                                | `void`      |
-| `GCH_ResetLights(int ControllerId)`                                                                                                                                                                                                                | `void`      |
-| `GCH_ResetGyroOrientation(int ControllerId)` | `void` |
-| `GCH_EnableGyroscopeValues(int ControllerId, bool EnableGyroscope)` | `void` |
-| `GCH_EnableTouch(int ControllerId, bool EnableTouch)` | `void` |
-| `GCH_CustomTrigger(int ControllerId, const std::uint8_t* HexBytes, int ByteCount, int Hand)` | `bool` |
-| `GCH_StopTrigger(int ControllerId, int Hand)` | `void` |
-| `GCH_SetVibration(int ControllerId, std::uint8_t LeftRumble, std::uint8_t RightRumble)` | `void` |
+[**Open Gamepad-Core Live Tests →**](https://rafaelvaloto.github.io/Gamepad-Core-Web/testes/index.html)
 
-The `int` parameters used for device type, connection type, LED, and trigger hand correspond to the enum values defined by the native [Gamepad-Core/Dualsense-Multiplatform](https://github.com/rafaelvaloto/Dualsense-Multiplatform) library.
-
-**`GCH_DualSenseSettings`** allows you to configure advanced settings exclusive to the DualSense controller, including
-audio control (microphone, headset, speaker), volumes, vibration modes, and force reduction on adaptive triggers.
-
-```cpp
-GCH_DualSenseSettings(int ControllerId, std::uint8_t bIsMic, std::uint8_t bIsHeadset, std::uint8_t bIsSpeaker, std::uint8_t MicVolume, std::uint8_t AudioVolume, std::uint8_t RumbleMode, std::uint8_t RumbleReduce, std::uint8_t TriggerReduce)
-```
+> Connect a supported gamepad and test the native C++ bridge running through WASM.
 
 ---
-
-## 🧪 Quick Testing
 
 Test quickly with a C# implementation or create an implementation for your preferred language. The C-compatible API is
 designed to integrate seamlessly with any language that supports FFI (Foreign Function Interface), including Python,
@@ -186,6 +159,44 @@ custom type declarations for the exported native functions and callback
 signatures.
 
 ---
+
+
+## 📚 API References
+
+The following functions are exported by the native bridge:
+
+| Function                                                                                                                                                                                                                                           | Return type |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|
+| `GCH_DiscoverDevices(float DeltaTime)`                                                                                                                                                                                                             | `void`      |
+| `GCH_UpdateInput(int DeviceId, float DeltaTime)`                                                                                                                                                                                                   | `void`      |
+| `GCH_UpdateOutput(int ControllerId)`                                                                                                                                                                                                               | `void`      |
+| `GCH_GetInputState(int DeviceId, FInputContext* OutInputState)`                                                                                                                                                                                    | `bool`      |
+| `GCH_GetDeviceDescriptor(int DeviceId, GamepadDeviceDescriptor* OutDescriptor)`                                                                                                                                                                    | `bool`      |
+| `GCH_DeviceIsConnected(int ControllerId)`                                                                                                                                                                                                          | `bool`      |
+| `GCH_GetDeviceType(int ControllerId)`                                                                                                                                                                                                              | `int`       |
+| `GCH_GetConnectionType(int ControllerId)`                                                                                                                                                                                                          | `int`       |
+| `GCH_BatteryLevelDevice(int ControllerId)`                                                                                                                                                                                                         | `float`     |
+| `GCH_Lightbar(int ControllerId, std::uint8_t R, std::uint8_t G, std::uint8_t B)`                                                                                                                                                                   | `void`      |
+| `GCH_PlayerLed(int ControllerId, int Led, std::uint8_t Brightness)`                                                                                                                                                                                | `void`      |
+| `GCH_ResetLights(int ControllerId)`                                                                                                                                                                                                                | `void`      |
+| `GCH_ResetGyroOrientation(int ControllerId)` | `void` |
+| `GCH_EnableGyroscopeValues(int ControllerId, bool EnableGyroscope)` | `void` |
+| `GCH_EnableTouch(int ControllerId, bool EnableTouch)` | `void` |
+| `GCH_CustomTrigger(int ControllerId, const std::uint8_t* HexBytes, int ByteCount, int Hand)` | `bool` |
+| `GCH_StopTrigger(int ControllerId, int Hand)` | `void` |
+| `GCH_SetVibration(int ControllerId, std::uint8_t LeftRumble, std::uint8_t RightRumble)` | `void` |
+
+The `int` parameters used for device type, connection type, LED, and trigger hand correspond to the enum values defined by the native [Gamepad-Core/Dualsense-Multiplatform](https://github.com/rafaelvaloto/Dualsense-Multiplatform) library.
+
+**`GCH_DualSenseSettings`** allows you to configure advanced settings exclusive to the DualSense controller, including
+audio control (microphone, headset, speaker), volumes, vibration modes, and force reduction on adaptive triggers.
+
+```cpp
+GCH_DualSenseSettings(int ControllerId, std::uint8_t bIsMic, std::uint8_t bIsHeadset, std::uint8_t bIsSpeaker, std::uint8_t MicVolume, std::uint8_t AudioVolume, std::uint8_t RumbleMode, std::uint8_t RumbleReduce, std::uint8_t TriggerReduce)
+```
+
+---
+
 
 ## 🛠️ Building
 
