@@ -44,10 +44,6 @@ namespace GCH
 
 	void PlatformBridgePolicy::Write(FDeviceContext* Context)
 	{
-		char Message[128];
-		std::snprintf(Message, sizeof(Message), "Write init device status: %d", Context->IsConnected);
-		GCL::Error(0, Message);
-
 		if (!Context || !Context->IsConnected)
 			return;
 
@@ -169,7 +165,7 @@ namespace GCH
 			}
 
 			Context->Calibration = Calibration;
-			GCL::Error(0, "Configure Features DualShock, Calibration");
+			GCL::Log(0, "Configure Features DualShock, Calibration");
 		}
 		else
 		{
@@ -182,13 +178,13 @@ namespace GCH
 			DualSenseCalibrationSensors(FeatureBuffer, Calibration, Context);
 			Context->Calibration = Calibration;
 
-			GCL::Error(0, "Configure Features DualSense 41, Calibration");
+			GCL::Log(0, "Configure Features DualSense 41, Calibration");
 		}
 	}
 
 	void PlatformBridgePolicy::InvalidateHandle(FDeviceContext* Context)
 	{
-		GCL::Error(0, "Invalidate Handle");
+		GCL::Log(0, "Invalidate Handle");
 		if (!Context)
 			return;
 
@@ -214,5 +210,30 @@ namespace GCH
 
 	void PlatformBridgePolicy::ProcessAudioHaptic(FDeviceContext* Context)
 	{
+		GCL::Log(0, "[Platform] ProcessAudioHaptic");
+		if (!Context)
+		{
+			GCL::Log(0, "Invalid Context");
+			return;
+		}
+
+		if (Context->ConnectionType != EDSDeviceConnection::Bluetooth)
+		{
+			GCL::Log(0, "Invalid Connection Type");
+			return;
+		}
+
+
+		unsigned char* buffer = Context->BufferHapitcs;
+		const auto Handle = reinterpret_cast<std::uintptr_t>(Context->Handle);
+
+		std::int32_t BytesWritten = 0;
+		constexpr std::int32_t BytesSending = 398;
+		if (const std::int32_t Result = g_PlatformWriteCallback(Handle, buffer, BytesSending, &BytesWritten))
+		{
+			char Message[128];
+			std::snprintf(Message, sizeof(Message), "Bytes Written %d file status: %d", BytesWritten, Result);
+			GCL::Log(0, Message);
+		}
 	}
 } // namespace GCH

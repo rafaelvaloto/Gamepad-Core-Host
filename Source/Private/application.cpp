@@ -5,9 +5,11 @@
 #include "application.h"
 
 #include "Adapters/DeviceRegistry.h"
+#include "Adapters/AudioDeviceRegistry.h"
 
 GCH_API void GCH_Shutdown()
 {
+	GCH::AudioDeviceRegistry::Shutdown();
 	GCH::FDeviceRegistry::Shutdown();
 	IPlatformHardware::SetInstance(nullptr);
 

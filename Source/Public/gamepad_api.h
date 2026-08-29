@@ -9,6 +9,15 @@
 extern "C"
 {
 
+GCH_API bool GCH_AudioSubmitSamples(const float* AudioData, int FrameCount, int NumChannels, int SampleRate);
+
+GCH_API bool GCH_GetProcessAudioHaptics(int DeviceId);
+
+/** Configures volume and gain applied to browser audio before Bluetooth encoding.
+ * Volume is normalized from 0.0 to 1.0. Gain 1.0 preserves the input level.
+ */
+GCH_API void GCH_InitializeAudio(float Volume, float Gain);
+
 /**
  * Discovers and initializes connected gamepad devices.
  *

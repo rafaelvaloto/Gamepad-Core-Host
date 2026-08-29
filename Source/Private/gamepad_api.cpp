@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <vector>
 #include "Adapters/DeviceRegistry.h"
+#include "Adapters/AudioDeviceRegistry.h"
 #include "GCore/Types/ECoreGamepad.h"
 #include "Types/MakeTypes.h"
 
@@ -22,6 +23,51 @@ namespace
 		return Hand >= static_cast<int>(EDSGamepadHand::Left) &&
 		       Hand <= static_cast<int>(EDSGamepadHand::AnyHand);
 	}
+}
+
+GCH_API bool GCH_AudioSubmitSamples(const float* AudioData, const int FrameCount,
+									const int NumChannels, const int SampleRate)
+{
+	if (FrameCount <= 0)
+	{
+		GCL::Error(0, "[Error]: GCH_AudioSubmitSamples called with invalid FrameCount");
+		return false;
+	}
+
+	return GCH::AudioDeviceRegistry::Get()->SubmitAudio(
+		AudioData, static_cast<std::uint32_t>(FrameCount), NumChannels, SampleRate);
+}
+
+GCH_API void GCH_InitializeAudio(const float Volume, const float Gain)
+{
+	if (auto* Audio = GCH::AudioDeviceRegistry::Get())
+	{
+		Audio->SetVolume(Volume);
+		Audio->SetGain(Gain);
+	}
+}
+
+GCH_API bool GCH_GetProcessAudioHaptics(const int DeviceId)
+{
+	auto* Registry = GCH::FDeviceRegistry::Get();
+	if (!Registry)
+	{
+		if constexpr (GCL_DEBUG)
+		{
+			char Message[128];
+			std::snprintf(Message, sizeof(Message), "GCH_GetProcessAudioHaptics called before GCH_InitializePlatformBridge: %d", DeviceId);
+			GCL::Error(1, Message);
+		}
+		return false;
+	}
+
+	auto* Gamepad = Registry->GetLibrary(DeviceId);
+	if (!Gamepad || !Gamepad->IsConnected() ||
+		Gamepad->GetConnectionType() != EDSDeviceConnection::Bluetooth)
+		return false;
+
+	auto* AudioHaptics = Gamepad->GetIGamepadHaptics();
+	return AudioHaptics && GCH::AudioDeviceRegistry::Get()->ProcessAudioHaptics(AudioHaptics);
 }
 
 GCH_API void GCH_DiscoverDevices(const float DeltaTime)
@@ -52,6 +98,8 @@ GCH_API void GCH_CreateDevice(const GamepadDeviceDescriptor* Descriptor)
 
 GCH_API void GCH_UpdateInput(const int DeviceId, const float DeltaTime)
 {
+	GCH_GetProcessAudioHaptics(DeviceId);
+
 	auto* Registry = GCH::FDeviceRegistry::Get();
 	if (!Registry)
 	{
@@ -220,11 +268,20 @@ GCH_API void GCH_DualSenseSettings(
 	const std::uint8_t TriggerReduce)
 {
 	auto* Gamepad = FindGamepad(ControllerId);
+	auto* Context = Gamepad ? Gamepad->GetMutableDeviceContext() : nullptr;
 	if (auto* Settings = Gamepad ? Gamepad->GetIGamepadSettings() : nullptr)
 	{
-		Settings->DualSenseSettings(
-			bIsMic, bIsHeadset, bIsSpeaker, MicVolume, AudioVolume,
-			RumbleMode, RumbleReduce, TriggerReduce);
+		if (Context->Output.Audio.HeadsetVolume != AudioVolume)
+		{
+			Context->Output.Audio.HeadsetVolume = AudioVolume;
+			Context->Output.Audio.SpeakerVolume = AudioVolume;
+			if (const auto* Audio = GCH::AudioDeviceRegistry::Get())
+			{
+				const float Volume = static_cast<float>(AudioVolume) / 100.0f;
+				GCH_InitializeAudio(Volume, Audio->GetGain());
+			}
+		}
+		Settings->DualSenseSettings(Context->Output.Audio.MicStatus, bIsHeadset, bIsSpeaker, Context->Output.Audio.MicVolume, AudioVolume,RumbleMode, RumbleReduce, TriggerReduce);
 	}
 }
 
